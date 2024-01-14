@@ -26,21 +26,16 @@ expdecay = function(p, decay, init_val){
 }
 
 # This function is for simulating community data
-Lclust = function(p, r, mu, sd){
+Lclust = function(p, r, init_val, sd){
   # Define Z
   Z = matrix(0, p, r)
   for(i in 1:p){
     Z[i,round(runif(1, 1, r))] = 1
   }
   
-  # Multiply by random strengths - centered at mu
-  Z = Z * matrix(rnorm(p * r, mean = mu, sd = sd), p, r)
-  
-  # Add noise - centered at 0
-  Z = Z + matrix(rnorm(p * r, mean = 0, sd = sd), p, r)
-  
   # Test w/ L
   L = Z %*% t(Z)
+  L = L * init_val
   
   # Return output
   return(list(L = L, Z = Z))
