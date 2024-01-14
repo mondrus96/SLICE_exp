@@ -1,5 +1,5 @@
 # This function is a simulation type where there is an exponential decay from the main diagonal
-expdecay = function(p, decay, init_val){
+Smat = function(p, decay, init_val){
   # Create an empty matrix
   Theta = matrix(0, p, p)
   
@@ -26,11 +26,11 @@ expdecay = function(p, decay, init_val){
 }
 
 # This function is for simulating community data
-Lclust = function(p, r, init_val, sd){
+Lmat = function(p, r, init_val, sd = 0){
   # Define Z
   Z = matrix(0, p, r)
   for(i in 1:p){
-    Z[i,round(runif(1, 1, r))] = 1
+    Z[i,sample(1:r, 1)] = 1
   }
   
   # Test w/ L

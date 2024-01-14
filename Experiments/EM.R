@@ -1,6 +1,8 @@
 # EM ALGORITHM?
-source("../Simulations/gen_mat.R")
-source("../Solvers/ilrglasso.R")
+source("../Simulations/sims.R")
+source("../Models/slice.R")
+source("../Models/cv.slice.R")
+source("../Models/helper.R")
 library(clime)
 library(glasso)
 library(Matrix)
@@ -16,12 +18,13 @@ init_S = 1.5 # Initial value for S
 init_L = 1.5 # Initial value for L
 
 # Get sparse S_star components
-S_star = expdecay(pobs, 1.5, init_S)
+S_star = Smat(pobs, 1.5, init_S)
 S_star[S_star < 0.01] = 0
 
 # Define L
-clustout = Lclust(pobs, plat, init_L, latsd)
+clustout = Lmat(pobs, plat, init_L)
 L_star = clustout$L; Z_star = clustout$Z
+heatmap(L_star)
 
 # Add noise
 noise = matrix(rnorm(pobs * pobs, 0, 0.5), pobs, pobs)
@@ -32,59 +35,12 @@ Sigma_star = solve(S_star + L_star)
 
 # Define true Sigma, Sigma_star
 library(MASS)
-data = mvrnorm(n, rep(0, pobs), Sigma = Sigma_star)
-Sigma = cov(data)
+X = mvrnorm(n, rep(0, pobs), Sigma = Sigma_star)
+sigma = cov(X)
 
-TOL = 1e-8
-nfolds = 3
-lambdas = c(0.0001, 0.001, 0.01, 0.1, 0.2)
-rs = c(2, 3, 4, 5, 6)
-modselec = matrix(NA, length(rs), length(lambdas)); rownames(modselec) = rs; colnames(modselec) = lambdas
-
-ebics = bics = CVs = modselec
-
-# Loop through different rank and lambdas
-for(k in 1:length(rs)){
-  print(paste0("rank: ", rs[k]))
-  for(j in 1:length(lambdas)){
-    print(paste0("lambda: ", lambdas[j]))
-    # Run estimation
-    indices = sample(1:nfolds, n, replace = TRUE)
-    meanlikl = c()
-    for(l in 1:nfolds){
-      # Define train and test
-      train = data[indices != l,]
-      test = data[indices == l,]
-      
-      # Run ilrglasso
-      out = ilrglasso(cov(train), lambdas[j], rs[k])
-      S = out$S; L = out$L
-      
-      # Append to meanlikl
-      loglikl = loglikelihood(cov(test), S, L)
-      meanlikl = c(meanlikl, loglikl)
-    }
-    CVs[k, j] = mean(meanlikl)
-    
-    # Over whole dataset for ebic and bic  
-    out = ilrglasso(Sigma, lambdas[j], rs[k])
-    S = out$S; L = out$L
-    
-    # Get likelihood
-    loglikl = loglikelihood(Sigma, S, L)
-    S_params = sum(S[upper.tri(S)] != 0)
-    L_params = rs[k] + (rs[k]*(pobs-1))/2
-    bics[k, j] = bic(loglikl, n, (L_params + S_params))
-    ebics[k, j] = ebic(loglikl, pobs, n, (L_params + S_params))
-  }
-}
-loglikl = loglikelihood(Sigma, S, L)
-S_params = sum(S[upper.tri(S)] != 0)
-L_params = r + (r*(pobs-1))/2
-bic(loglikl, n, (L_params + S_params))
-
-
-out = ilrglasso(Sigma, 0.01, 4)
+# Run slice
+cvout = cv.slice(X, lambdas = c(0.1, 0.2), rs = 4:5)
+out = slice(sigma, 0.1, 4)
 S = out$S; L = out$L
 
 heatmap(1*(S != 0), Rowv = NA, Colv = NA)
@@ -94,8 +50,6 @@ heatmap(L_star, Rowv = NA, Colv = NA)
 
 eigL = eigen(L)$vectors[,1:plat]
 eigL_star = eigen(L_star)$vectors[,1:plat]
-
-library(randnet)
 
 predclust = kmeans(eigL, plat, 10000)$cluster
 trueclust = kmeans(eigL_star, plat, 10000)$cluster
@@ -110,3 +64,47 @@ sin_theta
 
 norm(L - L_star)
 norm(Omega - S_star)
+
+
+library(ggplot2)
+
+# Function to generate 'circles' data
+generate_circles <- function(n_samples, noise) {
+  set.seed(42)
+  t <- runif(n_samples, 0, 2 * pi)
+  r <- sqrt(runif(n_samples, 0, 1))
+  x <- c(r * cos(t), (r + 0.5) * cos(t))
+  y <- c(r * sin(t), (r + 0.5) * sin(t))
+  x <- x + rnorm(length(x), sd=noise)
+  y <- y + rnorm(length(y), sd=noise)
+  data.frame(x = x, y = y)
+}
+
+# Function to generate 'moons' data
+generate_moons <- function(n_samples, noise) {
+  set.seed(42)
+  t <- runif(n_samples / 2, 0, pi)
+  x <- c(cos(t), 1 - cos(t))
+  y <- c(sin(t), 1 - sin(t))
+  x <- x + rnorm(length(x), sd=noise)
+  y <- y + rnorm(length(y), sd=noise)
+  data.frame(x = x, y = y)
+}
+
+# Generate the datasets
+n_samples <- 300
+circles_data <- generate_circles(n_samples, noise = 0.05)
+moons_data <- generate_moons(n_samples, noise = 0.05)
+
+# Plot the datasets using ggplot2
+ggplot() +
+  geom_point(data = circles_data, aes(x = x, y = y), color = "blue") +
+  ggtitle("Circles") +
+  theme_minimal() +
+  xlim(c(-1.5, 2.5)) + ylim(c(-1.5, 1.5))
+
+ggplot() +
+  geom_point(data = moons_data, aes(x = x, y = y), color = "red") +
+  ggtitle("Moons") +
+  theme_minimal() +
+  xlim(c(-0.5, 2.5)) + ylim(c(-0.5, 1.5))

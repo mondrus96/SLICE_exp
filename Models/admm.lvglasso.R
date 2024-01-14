@@ -1,4 +1,4 @@
-admmlatentglasso <- function(Sigma, lambda, gamma, rho, MAX_ITER = 1000, ABSTOL = 1e-4, RELTOL = 1e-2) {
+admmlatentglasso <- function(Sigma, lambda, gamma, rho, maxiter = 1000, abstol = 1e-4, reltol = 1e-2) {
   p <- ncol(Sigma)
   
   R <- matrix(0, p, p)
@@ -6,10 +6,10 @@ admmlatentglasso <- function(Sigma, lambda, gamma, rho, MAX_ITER = 1000, ABSTOL 
   L <- matrix(0, p, p)
   U <- matrix(0, p, p)
   
-  history <- list(objval = rep(NA, MAX_ITER), r_norm = rep(NA, MAX_ITER), 
-                  s_norm = rep(NA, MAX_ITER), eps_pri = rep(NA, MAX_ITER), eps_dual = rep(NA, MAX_ITER))
+  history <- list(objval = rep(NA, maxiter), r_norm = rep(NA, maxiter), 
+                  s_norm = rep(NA, maxiter), eps_pri = rep(NA, maxiter), eps_dual = rep(NA, maxiter))
   
-  for (k in 1:MAX_ITER) {
+  for (k in 1:maxiter) {
     
     # R-update
     Rold <- R
@@ -17,17 +17,17 @@ admmlatentglasso <- function(Sigma, lambda, gamma, rho, MAX_ITER = 1000, ABSTOL 
     es <- eigout$values
     xi <- (es + sqrt(es^2 + 4*rho)) / (2*rho)
     R <- eigout$vectors %*% diag(xi) %*% t(eigout$vectors)
-    R = (R + t(R))/2
+    R <- (R + t(R))/2
     
     # S-update
     Sold <- S
     S <- L1_shr(R + U, lambda / rho)
-    S = (S + t(S))/2
+    S <- (S + t(S))/2
     
     # L-update ###
     Lold <- L 
     L <- nucl_shr(R - S, gamma / rho)
-    L = (L + t(L))/2
+    L <- (L + t(L))/2
     
     # Update dual variable
     U <- U + (R - S - L) ###
@@ -36,8 +36,8 @@ admmlatentglasso <- function(Sigma, lambda, gamma, rho, MAX_ITER = 1000, ABSTOL 
     history$objval[k] <- objective(Sigma, R, S, L, lambda, gamma) ###
     history$r_norm[k] <- norm(R - S + L, type = "F") ###
     history$s_norm[k] <- rho*(norm((R - Rold), type = "F")) ###
-    history$eps_pri[k] <- sqrt(p*p) * ABSTOL + RELTOL * max(norm(R, type = "F"), norm(S - L, type = "F")) ###
-    history$eps_dual[k] <- sqrt(p*p) * ABSTOL + RELTOL * norm(rho * U, type = "F")
+    history$eps_pri[k] <- sqrt(p*p) * abstol + reltol * max(norm(R, type = "F"), norm(S - L, type = "F")) ###
+    history$eps_dual[k] <- sqrt(p*p) * abstol + reltol * norm(rho * U, type = "F")
     
     if (history$r_norm[k] < history$eps_pri[k] && history$s_norm[k] < history$eps_dual[k]) {
       break
