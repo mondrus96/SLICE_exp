@@ -1,4 +1,4 @@
-slime = function(Sigma, lambda, rank, TOL = 1e-4, rand.init = FALSE){
+slice = function(Sigma, lambda, rank, TOL = 1e-4, rand.init = FALSE){
   # Sigma = the input covariance matrix
   # lambda = regularization parameter for clime/graphical lasso
   # rank = rank
@@ -10,7 +10,7 @@ slime = function(Sigma, lambda, rank, TOL = 1e-4, rand.init = FALSE){
   
   # Initial estimate of L
   if(rand.init == TRUE){
-    L = matrix(rnorm(p * p, 0, 0.001), p, p)
+    L = matrix(rnorm(p * p, 0, 0.01), p, p)
   } else{
     L = matrix(0, p, p)
   }
