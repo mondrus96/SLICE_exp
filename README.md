@@ -1,1 +1,1 @@
-# Sparse + Low-rank Inverse Covariance Matrix Estimation
+# Sparse + Low-rank Inverse Covariance Estimation
