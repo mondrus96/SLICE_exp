@@ -9,5 +9,5 @@ ns <- seq(50, 300, 50) # Number of observations
 init_S <- 1.5 # Initial value for S
 init_L <- 1.5 # Initial value for L
 
-simtype = "unif"
+simtype = "exp"
 runsim(simtype, pobs, plats, ns, init_S, init_L)
