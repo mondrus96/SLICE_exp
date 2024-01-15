@@ -1,10 +1,10 @@
-admmlatentglasso <- function(Sigma, lambda, gamma, rho, maxiter = 1000, abstol = 1e-4, reltol = 1e-2) {
+lvglasso <- function(Sigma, lambda, gamma, rho = 1, maxiter = 100, abstol = 1e-4, reltol = 1e-2) {
   p <- ncol(Sigma)
   
-  R <- matrix(0, p, p)
-  S <- matrix(0, p, p)
-  L <- matrix(0, p, p)
-  U <- matrix(0, p, p)
+  R <- matrix(0, p, p) # for logdet + trace step
+  S <- matrix(0, p, p) # sparse component
+  L <- matrix(0, p, p) # latent component
+  U <- matrix(0, p, p) # dual variable
   
   history <- list(objval = rep(NA, maxiter), r_norm = rep(NA, maxiter), 
                   s_norm = rep(NA, maxiter), eps_pri = rep(NA, maxiter), eps_dual = rep(NA, maxiter))

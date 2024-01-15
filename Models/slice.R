@@ -1,16 +1,16 @@
-# Load libraries
 library(clime)
 library(glasso)
 
-# Main slice estimator code
-slice = function(sigma, lambda, rank, sest = "glasso", tol = 1e-4, randinit = FALSE, maxiter = 1000){
-  # sigma = the input covariance matrix
+# Main slice estimator
+slice <- function(Sigma, lambda, rank, sest = "glasso", tol = 1e-4, randinit = FALSE, maxiter = 100){
+  # Sigma = the input covariance matrix
   # lambda = regularization parameter for clime/graphical lasso
   # rank = rank
+  # sest = sparse estimator - glasso or clime
   
-  p <- ncol(sigma) # Make Sigma PD
-  sigma <- makePD(sigma)
-  invsigma <- solve(sigma)
+  p <- ncol(Sigma) # Make Sigma PD
+  Sigma <- makePD(Sigma)
+  invSigma <- solve(Sigma)
   
   # Initial estimate of L
   if(randinit == TRUE){
@@ -18,7 +18,7 @@ slice = function(sigma, lambda, rank, sest = "glasso", tol = 1e-4, randinit = FA
   } else{
     L <- matrix(0, p, p)
   }
-  E <- invsigma - L
+  E <- invSigma - L
   S <- matrix(0, p, p)
   
   for(i in 1:maxiter){
@@ -31,20 +31,24 @@ slice = function(sigma, lambda, rank, sest = "glasso", tol = 1e-4, randinit = FA
     Sold <- S # Sparse step
     if(sest == "glasso"){
       S <- glasso(solve(E), lambda)$wi 
+    } else if(sest == "clime"){
+      S <- clime(solve(E), lambda, Sigma = TRUE)$Omegalist[[1]]
     }
     S <- (S + t(S))/2
     
     Lold <- L # Latent step
-    L <- invsigma - S 
+    L <- invSigma - S 
     eigL <- eigen(L)
     L <- eigL$vectors[,1:rank] %*% diag(eigL$values[1:rank]) %*% t(eigL$vectors[,1:rank])
     L <- (L + t(L))/2
     
-    E <- invsigma - L # Define new expectation
+    E <- invSigma - L # Define new expectation
     E <- (E + t(E))/2
     
     # Convergence check
-    if(norm(S - Sold) < tol && (norm(L - Lold) < tol)){
+    paramdiff = (norm(S - Sold) < tol) && (norm(L - Lold) < tol)
+    objdiff = norm(invSigma - (S + L)) < tol
+    if(paramdiff || objdiff){
       break
     }
   }
