@@ -2,11 +2,10 @@
 sapply((paste0("../Models/", list.files("../Models/"))), source)
 sapply((paste0("../Simulations/", list.files("../Simulations/"))), source)
 
+set.seed(123)
 pobs <- 200 # Number of observed variables for S
-pobs = 50
-plats <- 2 # Number of latent variables for L
+plats <- 2:8 # Number of latent variables for L
 ns <- seq(50, 300, 50) # Number of observations
-ns = c(50, 100)
 
 init_S <- 1.5 # Initial value for S
 init_L <- 1.5 # Initial value for L

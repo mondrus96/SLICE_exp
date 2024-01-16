@@ -12,9 +12,7 @@ runsim = function(simtype, pobs, plats, ns, init_S, init_L = NULL){
     for(j in 1:length(ns)){
       print(paste0("n: ", ns[j]))
       # Loop through 100 iterations of simulation
-      subdf = foreach(k = 1:16, .combine = rbind, .packages = c("MASS")) %dopar% {
-        set.seed(k*123)
-        
+      for(k in 1:100){
         S_star <- Smat(pobs, 1.5, init_S)
         S_star[S_star < 0.01] <- 0 # True sparse component
         
@@ -56,10 +54,9 @@ runsim = function(simtype, pobs, plats, ns, init_S, init_L = NULL){
         lvg_sin <- sintheta(eigL_star$vectors[,1], eigLlvg$vectors[,1]) # Sin Theta
         sli_sin <- sintheta(eigL_star$vectors[,1], eigLsli$vectors[,1])
         
-        return(c(plats[i], ns[j], lvg_nmi, sli_nmi, 
+        df = rbind(df, c(plats[i], ns[j], lvg_nmi, sli_nmi, 
                  lvg_ari, sli_ari, lvg_sin, sli_sin))
       }
-      df = rbind(df, subdf)
       colnames(df) = c("plat", "n", "lvg_nmi", "sli_nmi",
                        "lvg_ari", "sli_ari", "lvg_sin", "sli_sin")
       rownames(df) = NULL
