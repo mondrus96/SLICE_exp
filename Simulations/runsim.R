@@ -12,7 +12,7 @@ runsim = function(simtype, pobs, plats, ns, init_S, init_L = NULL){
     for(j in 1:length(ns)){
       print(paste0("n: ", ns[j]))
       # Loop through 100 iterations of simulation
-      subdf = foreach(k = 1:100, .combine = rbind, .packages = c("MASS")) %dopar% {
+      subdf = foreach(k = 1:16, .combine = rbind, .packages = c("MASS")) %dopar% {
         set.seed(k*123)
         
         S_star <- Smat(pobs, 1.5, init_S)
