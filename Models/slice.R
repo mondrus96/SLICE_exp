@@ -22,7 +22,6 @@ slice <- function(Sigma, lambda, rank, sest = "glasso", tol = 1e-4, randinit = F
   S <- matrix(0, p, p)
   
   for(i in 1:maxiter){
-    print(i)
     # Make expectation PD
     if(!isPD(E)){
       E <- makePD(E)
