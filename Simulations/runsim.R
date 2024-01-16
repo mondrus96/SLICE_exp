@@ -7,7 +7,7 @@ runsim = function(simtype, pobs, plat = NA, ns, init_S, init_L = NULL){
   for(i in 1:length(ns)){
     print(paste0("n: ", ns[i]))
     # Loop through 100 iterations of simulation
-    for(j in 1:100){
+    for(j in 1:8){
       set.seed(123*j)
       
       S_star <- Smat(pobs, 2, init_S)
