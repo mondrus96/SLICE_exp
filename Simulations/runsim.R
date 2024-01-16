@@ -4,8 +4,6 @@ library(doParallel)
 
 # Function for running simulations
 runsim = function(simtype, pobs, plats, ns, init_S, init_L = NULL){
-  registerDoParallel(detectCores()) # Parallel back end setup
-  df = c()
   for(i in 1:length(plats)){
     print(paste0("plat: ", plats[i]))
     # Loop through different values of ns
