@@ -1,4 +1,4 @@
-lvglasso <- function(Sigma, lambda, gamma, rho = 1, maxiter = 100, abstol = 1e-4, reltol = 1e-2) {
+lvglasso <- function(Sigma, lambda, gamma, rho = 1, maxiter = 100, tol = 1e-3){
   p <- ncol(Sigma)
   
   R <- matrix(0, p, p) # for logdet + trace step
@@ -34,8 +34,8 @@ lvglasso <- function(Sigma, lambda, gamma, rho = 1, maxiter = 100, abstol = 1e-4
     history$objval <- c(history$objval, objective(Sigma, R, S, L, lambda, gamma))
     history$r_norm <- c(history$r_norm, norm(R - S + L, type = "F"))
     history$s_norm <- c(history$s_norm, rho*(norm((R - Rold), type = "F")))
-    history$eps_pri <- c(history$eps_pri, sqrt(p*p) * abstol + reltol * max(norm(R, type = "F"), norm(S - L, type = "F")))
-    history$eps_dual <- c(history$eps_dual, sqrt(p*p) * abstol + reltol * norm(rho * U, type = "F"))
+    history$eps_pri <- c(history$eps_pri, sqrt(p*p) * tol + tol * max(norm(R, type = "F"), norm(S - L, type = "F")))
+    history$eps_dual <- c(history$eps_dual, sqrt(p*p) * tol + tol * norm(rho * U, type = "F"))
     
     if (history$r_norm[i] < history$eps_pri[i] && history$s_norm[i] < history$eps_dual[i]) {
       break

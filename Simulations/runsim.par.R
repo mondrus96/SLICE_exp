@@ -1,13 +1,16 @@
 library(MASS)
+library(foreach)
+library(doParallel)
 
 # Function for running simulations
-runsim = function(simtype, pobs, plat = NA, ns, init_S, init_L = NULL){
+runsim.par = function(simtype, pobs, plat = NA, ns, init_S, init_L = NULL){
+  registerDoParallel(detectCores())
   df = c()
   # Loop through different values of ns
   for(i in 1:length(ns)){
     print(paste0("n: ", ns[i]))
     # Loop through 100 iterations of simulation
-    for(j in 1:100){
+    subdf = foreach(j = 1:8, .combine = rbind) %dopar% {
       set.seed(123*j)
       
       S_star <- Smat(pobs, 2, init_S)
@@ -51,12 +54,13 @@ runsim = function(simtype, pobs, plat = NA, ns, init_S, init_L = NULL){
       lvg_sin <- sintheta(eigL_star$vectors[,1], eigLlvg$vectors[,1]) # Sin Theta
       sli_sin <- sintheta(eigL_star$vectors[,1], eigLsli$vectors[,1])
       
-      df = rbind(df, c(plat, ns[i], lvg_nmi, sli_nmi, 
+      return(c(plat, ns[i], lvg_nmi, sli_nmi,
                lvg_ari, sli_ari, lvg_sin, sli_sin))
-      colnames(df) = c("plat", "n", "lvg_nmi", "sli_nmi",
-                       "lvg_ari", "sli_ari", "lvg_sin", "sli_sin")
-      rownames(df) = NULL
-      write.table(df, file = paste0("sim_", simtype, ".txt"), row.names = FALSE)
     }
+    df = rbind(df, subdf)
+    colnames(df) = c("plat", "n", "lvg_nmi", "sli_nmi",
+                     "lvg_ari", "sli_ari", "lvg_sin", "sli_sin")
+    rownames(df) = NULL
+    write.table(df, file = paste0("sim", simtype, "_rank", plat, ".txt"), row.names = FALSE)
   }
 }

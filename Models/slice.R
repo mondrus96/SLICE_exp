@@ -4,7 +4,7 @@ library(RSpectra)
 
 # Main slice estimator
 slice <- function(Sigma, lambda, rank, sest = "glasso",
-                  tol = 1e-2, maxiter = 100, randinit = FALSE){
+                  tol = 1e-3, maxiter = 100, randinit = FALSE){
   # Sigma = the input covariance matrix
   # lambda = regularization parameter for clime/graphical lasso
   # rank = rank
