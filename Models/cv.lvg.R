@@ -30,5 +30,5 @@ cv.lvg = function(X, folds = 3, lambdas = c(1e-4, 1e-3, 1e-2, 0.1), gammas = c(1
   }
   best <- which(cvmat == max(cvmat), arr.ind = TRUE)
   
-  return(list(cvmat = cvmat, maxlogL = max(cvmat), lambda = lambdas[best[1]], gamma = gammas[best[2]]))
+  return(list(cvmat = cvmat, maxlogL = max(cvmat), lambda = lambdas[best[2]], gamma = gammas[best[1]]))
 }
