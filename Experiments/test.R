@@ -2,14 +2,18 @@
 sapply((paste0("../Models/", list.files("../Models/"))), source)
 sapply((paste0("../Simulations/", list.files("../Simulations/"))), source)
 
-pobs <- 200 # Number of observed variables for S
-pobs = 50
+pobs <- 50 # Number of observed variables for S
 plats <- 2 # Number of latent variables for L
 ns <- seq(50, 300, 50) # Number of observations
-ns = c(50, 100)
 
 init_S <- 1.5 # Initial value for S
-init_L <- 1.5 # Initial value for L
 
-simtype = "unif"
-runsim(simtype, pobs, plats, ns, init_S, init_L)
+simtype <- "circ"
+
+S_star <- Smat(pobs, 2, init_S)
+Lout <- Lcirc(pobs)
+L_star <- Lout$L
+
+Sigma = solve(S_star + L_star)
+test1 = slice(Sigma, 0.01, 4)
+test2 = slice(Sigma, 0.01, 4, start = "zero")

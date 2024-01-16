@@ -1,5 +1,5 @@
 # For cross-validation
-cv.lvg = function(X, folds = 3, lambdas = c(1e-4, 1e-3, 1e-2, 0.1, 0.2, 0.4), gammas = c(1e-4, 1e-3, 1e-2, 0.1, 0.2, 0.4)){
+cv.lvg = function(X, folds = 3, lambdas = c(1e-4, 1e-3, 1e-2, 0.1), gammas = c(1e-4, 1e-3, 1e-2, 0.1)){
   # X = input data matrix
   # k = number of folds to perform for CV
   # lambdas = list of lambdas values to try
