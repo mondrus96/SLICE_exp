@@ -20,7 +20,6 @@ Rscript -e "
 sapply((paste0("../Models/", list.files("../Models/"))), source)
 sapply((paste0("../Simulations/", list.files("../Simulations/"))), source)
 
-set.seed(123)
 pobs <- 150 # Number of observed variables for S
 plat <- as.integer(Sys.getenv('plat')) # Number of latent variables for L
 n <- as.integer(Sys.getenv('n')) # Number of observations
