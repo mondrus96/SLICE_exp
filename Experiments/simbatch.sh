@@ -15,10 +15,10 @@ Rscript -e "
 sapply((paste0('../Models/', list.files('../Models/'))), source)
 sapply((paste0('../Simulations/', list.files('../Simulations/'))), source)
 
-print(paste("plat:", plat))
-print(paste("n:", n))
-print(paste("start:", start))
-print(paste("end:", end))
+print(paste('plat:', plat))
+print(paste('n:', n))
+print(paste('start:', start))
+print(paste('end:', end))
 
 simtype <- 'rand'
 pobs <- 150 # Number of observed variables for S
