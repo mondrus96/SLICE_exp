@@ -1,4 +1,4 @@
-# This function is a simulation type where there is an exponential decay from the main diagonal
+# Exponential decay from the main diagonal, for sparse matrix
 Smat <- function(p, decay, init_val){
   # Fill the matrix with exponential decay values
   S <- matrix(0, p, p)
@@ -20,7 +20,7 @@ Smat <- function(p, decay, init_val){
   return(S)
 }
 
-# This function is for simulating uniform community structure
+# Uniform community structure
 Lunif <- function(p, r, init_val, sd = 0){
   Z <- matrix(0, p, r) # Define Z
   for(i in 1:p){
@@ -34,7 +34,7 @@ Lunif <- function(p, r, init_val, sd = 0){
   return(list(L = L, z = z))
 }
 
-# This function is for simulating exponential community structure
+# Exponential community structure
 Lexp <- function(p, r, init_val){
   probs <- exp(-1*(0:(r - 1))) # Get probabilities
   probs <- probs/sum(probs)
@@ -51,7 +51,7 @@ Lexp <- function(p, r, init_val){
   return(list(L = L, z = z))
 }
 
-# This function is for simulating random community sizes
+# Random community sizes
 Lrand <- function(p, r, init_val){
   probs <- runif(r) # Get probabilities
   probs <- probs/sum(probs)
@@ -68,7 +68,7 @@ Lrand <- function(p, r, init_val){
   return(list(L = L, z = z))
 }
 
-# For creating crescent shape
+# Crescent shape
 Lcres <- function(p, sd = 0){
   theta_out <- seq(0, pi, length.out = p %/% 2) # Outer circle
   outer_circ_x <- cos(theta_out)
@@ -93,7 +93,7 @@ Lcres <- function(p, sd = 0){
   return(list(X = X, L = L, z = z))
 }
 
-# For creating circles, one within the other
+# Two circles, one within the other
 Lcirc <- function(p, sd = 0){
   linspace_out <- seq(0, 2 * pi, length.out = p %/% 2)
   outer_circ_x <- cos(linspace_out)
@@ -118,7 +118,7 @@ Lcirc <- function(p, sd = 0){
   return(list(X = X, L = L, z = z))
 }
 
-# For creating circles, one within the other
+# A single spiral
 Lspir <- function(p, sd = 0){
   theta <- seq(0, 2 * pi * 3, length.out = p)
   radius <- seq(0, 3, length.out = p)

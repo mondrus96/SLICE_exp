@@ -1,9 +1,7 @@
 #!/bin/bash
 
-#rank=(3 4 5 6 7)
-#n=(75 150 225 300 375)
-rank=(3)
-n=(75)
+rank=(3 4 5 6)
+n=(75 150 225 300 375)
 
 # Loop over rank
 for plat in "${rank[@]}"; do

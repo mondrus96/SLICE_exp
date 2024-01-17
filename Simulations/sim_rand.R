@@ -1,6 +1,4 @@
-# Uniform cluster sizes
-sapply((paste0("../Models/", list.files("../Models/"))), source)
-sapply((paste0("../Simulations/", list.files("../Simulations/"))), source)
+sapply((paste0("../Core/", list.files("../Core/"))), source)
 
 pobs <- 150 # Number of observed variables for S
 plat <- 4 # Number of latent variables for L

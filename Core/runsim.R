@@ -1,6 +1,5 @@
 library(MASS)
 
-# Function for running simulations
 runsim = function(simtype, pobs, plat = NULL, n, iters){
   df = c()
   # Loop through 100 iterations of simulation
