@@ -10,23 +10,19 @@
 module load gcc/9.3.0 r/4.3.1
 export R_LIBS=~/local/R_libs/
 
-export n=10000
-export plat=4
-export start=1
-export end=3
-
 Rscript -e "
 # Uniform cluster sizes
 sapply((paste0('../Models/', list.files('../Models/'))), source)
 sapply((paste0('../Simulations/', list.files('../Simulations/'))), source)
 
-pobs <- 50 # Number of observed variables for S
-plat <- as.integer(Sys.getenv('plat')) # Number of latent variables for L
-n <- as.integer(Sys.getenv('n')) # Number of observations
 simtype <- 'rand'
-start <- as.integer(Sys.getenv('start'))
-end <- as.integer(Sys.getenv('end'))
+pobs <- 150 # Number of observed variables for S
+args <- commandArgs(trailingOnly = TRUE)
+plat <- as.integer(args[1])
+n <- as.integer(args[2])
+start <- as.integer(args[3])
+end <- as.integer(args[4])
 iters <- start:end
 
 runsim(simtype, pobs, plat, n, iters)
-"
+" $plat $n $start $end

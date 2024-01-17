@@ -42,27 +42,35 @@ runsim = function(simtype, pobs, plat = NULL, n, iters){
     eigLsli <- eigen(sli$L)
     eigL_star <- eigen(L_star)
     
-    z_lvg <- kmeans(eigLlvg$vectors[,1:plat], plat, 1000)$cluster # Cluster predictions
-    z_sli <- kmeans(eigLsli$vectors[,1:plat], plat, 1000)$cluster
-    
-    lvg_nmi <- nmi(z_star, z_lvg) # NMI
-    sli_nmi <- nmi(z_star, z_sli) 
-    
-    lvg_ari <- ari(z_star, z_lvg) # ARI
-    sli_ari <- ari(z_star, z_sli)
-    
     lvg_sin <- sintheta(eigL_star$vectors[,1], eigLlvg$vectors[,1]) # Sin angle
     sli_sin <- sintheta(eigL_star$vectors[,1], eigLsli$vectors[,1])
     
     lvg_fnorm <- norm(L_star - lvg$L) # Frobenius norm
     sli_fnorm <- norm(L_star - sli$L)
     
-    df = rbind(df, c(plat, n, lvg_nmi, sli_nmi, 
-             lvg_ari, sli_ari, lvg_sin, sli_sin,
-             lvg_fnorm, sli_fnorm))
-    colnames(df) = c("plat", "n", "lvg_nmi", "sli_nmi",
-                     "lvg_ari", "sli_ari", "lvg_sin", "sli_sin",
-                     "lvg_fnorm", "sli_fnorm")
+    if(simtype %in% c("exp", "rand")){
+      z_lvg <- kmeans(eigLlvg$vectors[,1:plat], plat, 1000)$cluster # Cluster predictions
+      z_sli <- kmeans(eigLsli$vectors[,1:plat], plat, 1000)$cluster
+      
+      lvg_nmi <- nmi(z_star, z_lvg) # NMI
+      sli_nmi <- nmi(z_star, z_sli) 
+      
+      lvg_ari <- ari(z_star, z_lvg) # ARI
+      sli_ari <- ari(z_star, z_sli)
+      
+      df = rbind(df, c(plat, n, lvg_nmi, sli_nmi, 
+                       lvg_ari, sli_ari, lvg_sin, sli_sin,
+                       lvg_fnorm, sli_fnorm))
+      colnames(df) = c("plat", "n", "lvg_nmi", "sli_nmi",
+                       "lvg_ari", "sli_ari", "lvg_sin", "sli_sin",
+                       "lvg_fnorm", "sli_fnorm")
+    } else{
+      df = rbind(df, c(plat, n, lvg_sin, sli_sin,
+                       lvg_fnorm, sli_fnorm))
+      colnames(df) = c("plat", "n", "lvg_sin", "sli_sin",
+                       "lvg_fnorm", "sli_fnorm")
+    }
+    
     rownames(df) = NULL
     write.table(df, file = paste0("sim", simtype, "_plat", 
                                   plat, "_n", n, ".txt"), row.names = FALSE)
