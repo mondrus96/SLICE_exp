@@ -10,6 +10,8 @@
 module load gcc/9.3.0 r/4.3.1
 export R_LIBS=~/local/R_libs/
 
+echo "Received arguments: $plat $n $beg $end"
+
 Rscript -e "
 # Uniform cluster sizes
 sapply((paste0('../Models/', list.files('../Models/'))), source)
