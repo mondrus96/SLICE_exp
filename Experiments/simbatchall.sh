@@ -16,8 +16,7 @@ for plat in "${rank[@]}"; do
             end=$((25 * i))
 
             # Submit the job to SLURM with Rscript arguments
-            sbatch --job-name="plat${plat}_n${num}_batch${i}" \
-                   simbatch.sh $plat $num $start $end
+            sbatch --job-name="plat${plat}_n${num}_batch${i}" simbatch.sh $plat $num $start $end
             sleep 1
         done
     done
