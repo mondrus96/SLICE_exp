@@ -13,9 +13,7 @@ export R_LIBS=~/local/R_libs/
 echo "Received arguments: $1 $2 $3 $4"
 
 Rscript -e "
-# Uniform cluster sizes
-sapply((paste0('../Models/', list.files('../Models/'))), source)
-sapply((paste0('../Simulations/', list.files('../Simulations/'))), source)
+sapply((paste0("../Core/", list.files("../Core/"))), source)
 
 simtype <- 'rand'
 pobs <- 150 # Number of observed variables for S
