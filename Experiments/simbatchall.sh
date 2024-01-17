@@ -12,12 +12,12 @@ for plat in "${rank[@]}"; do
         # Loop over iterations
         for i in {1..4}; do
             # Define start and end
-            start=$((1 + 25 * (i - 1)))
+            beg=$((1 + 25 * (i - 1)))
             end=$((25 * i))
 
             # Submit the job to SLURM with Rscript arguments
             sbatch --job-name="plat${plat}_n${num}_batch${i}" \
-                   simbatch.sh $plat $num $start $end
+                   simbatch.sh $plat $num $beg $end
             sleep 1
         done
     done
