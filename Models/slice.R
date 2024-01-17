@@ -51,7 +51,7 @@ slice <- function(Sigma, lambda, rank, sest = "glasso",
     E <- (E + t(E))/2
     
     # Convergence check
-    deltaS = mean(abs(S - Sold)); deltaL = mean(abs(L - Lold))
+    deltaS = norm(S - Sold); deltaL = norm(L - Lold)
     deltalogL = suppressWarnings(abs(logL(Sigma, S, L) - logL(Sigma, Sold, Lold)))
     if((deltaS < tol) && (deltaL < tol) || 
        ifelse(is.na(deltalogL < tol), FALSE, deltalogL < tol)){

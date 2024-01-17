@@ -1,5 +1,5 @@
 # For cross-validation
-cv.slice = function(X, folds = 3, lambdas = c(1e-4, 1e-3, 1e-2, 0.1), rs = c(2:5), sest = "glasso"){
+cv.slice = function(X, folds = 3, lambdas = c(1e-3, 1e-2, 0.1), rs = c(2:4), sest = "glasso"){
   # X = input data matrix
   # k = number of folds to perform for CV
   # lambdas = list of lambdas values to try
