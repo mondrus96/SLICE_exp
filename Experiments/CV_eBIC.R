@@ -18,7 +18,7 @@ Sigma = cov(X)
 #lambdas = c(1e-4, 1e-3, 1e-2, 0.1, 0.2)
 #rs = 2:8
 
-CVout <- cv.slice(X, lambdas, rs) # Cross validation
+CVout <- cv.slice(X) # Cross validation
 out <- slice(cov(X), CVout$lambda, CVout$r) # Run method
 
 heatmap(1*(out$S != 0), Rowv = NA, Colv = NA)

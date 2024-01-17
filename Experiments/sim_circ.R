@@ -3,11 +3,9 @@ sapply((paste0("../Models/", list.files("../Models/"))), source)
 sapply((paste0("../Simulations/", list.files("../Simulations/"))), source)
 
 set.seed(123)
-pobs <- 200 # Number of observed variables for S
-plat <- 2 # Number of latent variables for L
-ns <- seq(100, 300, 50) # Number of observations
-
-init_S <- 1.5 # Initial value for S
-
+pobs <- 150 # Number of observed variables for S
+n <- 10000 # Number of observations
 simtype <- "circ"
-runsim.par(simtype, pobs, plat, ns, init_S, init_L)
+iters <- 1:100
+
+runsim(simtype, pobs, plat, n, iters)

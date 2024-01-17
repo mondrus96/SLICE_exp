@@ -9,4 +9,4 @@
 
 module load gcc/9.3.0 r/4.3.1
 export R_LIBS=~/local/R_libs/
-R CMD BATCH --no-save --no-restore sim_circ.R
+R CMD BATCH --no-save --no-restore sim_rand.R
