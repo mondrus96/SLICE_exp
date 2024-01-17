@@ -51,6 +51,23 @@ Lexp <- function(p, r, init_val){
   return(list(L = L, z = z))
 }
 
+# This function is for simulating random community sizes
+Lrand <- function(p, r, init_val){
+  probs <- runif(r) # Get probabilities
+  probs <- probs/sum(probs)
+  
+  Z <- matrix(0, p, r)
+  for(i in 1:p){
+    Z[i,sample(1:r, 1, prob = probs)] <- 1
+  }
+  z <- apply(Z, 1, function(row) which(row == 1))
+  
+  L <- Z %*% t(Z)
+  L <- L * init_val
+  
+  return(list(L = L, z = z))
+}
+
 # For creating crescent shape
 Lcres <- function(p, sd = 0.1){
   theta_out <- seq(0, pi, length.out = p %/% 2) # Outer circle

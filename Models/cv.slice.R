@@ -1,6 +1,6 @@
 # For cross-validation
 cv.slice = function(X, folds = 3, lambdas = c(1e-3, 1e-2, 0.1), rs = c(2:4), sest = "glasso"){
-  # X = input data matrix
+  # X = input data matrix, or Sigma
   # k = number of folds to perform for CV
   # lambdas = list of lambdas values to try
   # rs = list of rs to try
@@ -26,7 +26,7 @@ cv.slice = function(X, folds = 3, lambdas = c(1e-3, 1e-2, 0.1), rs = c(2:4), ses
         logL <- logL(cov(test), S, L) # Append to mulogL
         mulogL <- c(mulogL, logL)
       }
-      cvmat[i, j] <- mean(mulogL)
+      cvmat[i, j] <- mean(mulogL) 
     }
   }
   best <- which(cvmat == max(cvmat), arr.ind = TRUE)
