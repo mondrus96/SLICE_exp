@@ -15,6 +15,8 @@ Rscript -e "
 sapply((paste0('../Models/', list.files('../Models/'))), source)
 sapply((paste0('../Simulations/', list.files('../Simulations/'))), source)
 
+print(args)
+
 simtype <- 'rand'
 pobs <- 150 # Number of observed variables for S
 args <- commandArgs(trailingOnly = TRUE)
