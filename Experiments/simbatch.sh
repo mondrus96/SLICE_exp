@@ -10,7 +10,7 @@
 module load gcc/9.3.0 r/4.3.1
 export R_LIBS=~/local/R_libs/
 
-echo "Received arguments: $plat $n $beg $end"
+echo "Received arguments: $1 $2 $3 $4"
 
 Rscript -e "
 # Uniform cluster sizes
@@ -33,4 +33,4 @@ print(paste('end:', end))
 iters <- start:end
 
 runsim(simtype, pobs, plat, n, iters)
-" $plat $n $beg $end
+" $1 $2 $3 $4
