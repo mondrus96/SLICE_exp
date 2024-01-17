@@ -42,3 +42,24 @@ for(i in 1:length(rs)){
   }
 }
 best <- which(ebicmat == min(ebicmat), arr.ind = TRUE)
+
+plot_spiral <- function(turns, point_density = 100) {
+  # The total number of points is turns multiplied by point density
+  total_points <- turns * point_density
+  
+  # Create a sequence of angles for the spiral
+  theta <- seq(0, 2 * pi * turns, length.out = total_points)
+  
+  # The radius grows as the angle grows
+  radius <- seq(0, turns, length.out = total_points)
+  
+  # Convert polar coordinates (radius, theta) to Cartesian coordinates (x, y)
+  X <- 0.3*cbind(radius * cos(theta), radius * sin(theta))
+  
+  # Plot the spiral
+  plot(X, type = 'p', main = "2D Spiral", xlab = "X", ylab = "Y", asp = 1)
+}
+
+# Example usage: plot a spiral with 5 turns
+plot_spiral(3)
+

@@ -69,7 +69,7 @@ Lrand <- function(p, r, init_val){
 }
 
 # For creating crescent shape
-Lcres <- function(p, sd = 0.1){
+Lcres <- function(p, sd = 0){
   theta_out <- seq(0, pi, length.out = p %/% 2) # Outer circle
   outer_circ_x <- cos(theta_out)
   outer_circ_y <- sin(theta_out)
@@ -80,7 +80,7 @@ Lcres <- function(p, sd = 0.1){
   
   X <- rbind(cbind(outer_circ_x, outer_circ_y), cbind(inner_circ_x, inner_circ_y)) # Combine coordinates
   colnames(X) = c("x", "y")
-  z <- c(rep(0, p/2), rep(1, p/2)) # Cluster membership
+  z <- c(rep(1, p %/% 2), rep(2, p - (p %/% 2))) # Cluster membership
   
   X <- X + matrix(rnorm(prod(dim(X)), mean = 0, sd = sd), nrow = nrow(X), ncol = ncol(X))
   
@@ -88,24 +88,24 @@ Lcres <- function(p, sd = 0.1){
   X <- X[indices,]
   z <- z[indices]
   
-  L = X %*% t(X) # Generate L
+  L <- X %*% t(X) # Generate L
   
   return(list(X = X, L = L, z = z))
 }
 
 # For creating circles, one within the other
-Lcirc <- function(p, sd = 0.02){
+Lcirc <- function(p, sd = 0){
   linspace_out <- seq(0, 2 * pi, length.out = p %/% 2)
   outer_circ_x <- cos(linspace_out)
   outer_circ_y <- sin(linspace_out)
 
   linspace_in <- seq(0, 2 * pi, length.out = p - (p %/% 2))
-  inner_circ_x <- cos(linspace_in) * 0.8
-  inner_circ_y <- sin(linspace_in) * 0.8
+  inner_circ_x <- cos(linspace_in) * 0.5
+  inner_circ_y <- sin(linspace_in) * 0.5
   
   X <- rbind(cbind(outer_circ_x, outer_circ_y), cbind(inner_circ_x, inner_circ_y))
   colnames(X) = c("x", "y")
-  z <- c(rep(0, p %/% 2), rep(1, p - (p %/% 2)))
+  z <- c(rep(1, p %/% 2), rep(2, p - (p %/% 2)))
   
   X <- X + matrix(rnorm(prod(dim(X)), mean = 0, sd = sd), nrow = nrow(X), ncol = ncol(X))
   
@@ -113,7 +113,22 @@ Lcirc <- function(p, sd = 0.02){
   X <- X[indices,]
   z <- z[indices]
   
-  L = X %*% t(X) # Generate L
+  L <- X %*% t(X) # Generate L
   
   return(list(X = X, L = L, z = z))
+}
+
+# For creating circles, one within the other
+Lspir <- function(p, sd = 0){
+  theta <- seq(0, 2 * pi * 3, length.out = p)
+  radius <- seq(0, 3, length.out = p)
+  
+  X <- 0.3*cbind(radius * cos(theta), radius * sin(theta))# Define X
+  
+  indices <- sample(1:nrow(X)) # Permute indices
+  X <- X[indices,]
+  
+  L <- X %*% t(X) # Generate L
+  
+  return(list(X = X, L = L))
 }

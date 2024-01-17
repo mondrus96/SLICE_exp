@@ -16,10 +16,13 @@ runsim = function(simtype, pobs, plat = NULL, n, iters){
     } else if (simtype == "rand"){
       Lout <- Lrand(pobs, plat, 1.5)
     } else if (simtype == "cres"){
-      Lout <- Lcres(pobs)
+      Lout <- Lcres(pobs, 0.1)
       plat <- 2
     } else if (simtype == "circ"){
-      Lout <- Lcirc(pobs)
+      Lout <- Lcirc(pobs, 0.05)
+      plat <- 2
+    } else if (simtype == "spir"){
+      Lout <- Lspir(pobs, 0.05)
       plat <- 2
     }
     
@@ -48,13 +51,18 @@ runsim = function(simtype, pobs, plat = NULL, n, iters){
     lvg_ari <- ari(z_star, z_lvg) # ARI
     sli_ari <- ari(z_star, z_sli)
     
-    lvg_sin <- sintheta(eigL_star$vectors[,1], eigLlvg$vectors[,1]) # Sin Theta
+    lvg_sin <- sintheta(eigL_star$vectors[,1], eigLlvg$vectors[,1]) # Sin angle
     sli_sin <- sintheta(eigL_star$vectors[,1], eigLsli$vectors[,1])
     
+    lvg_fnorm <- norm(L_star - lvg$L) # Frobenius norm
+    sli_fnorm <- norm(L_star - sli$L)
+    
     df = rbind(df, c(plat, n, lvg_nmi, sli_nmi, 
-             lvg_ari, sli_ari, lvg_sin, sli_sin))
+             lvg_ari, sli_ari, lvg_sin, sli_sin,
+             lvg_fnorm, sli_fnorm))
     colnames(df) = c("plat", "n", "lvg_nmi", "sli_nmi",
-                     "lvg_ari", "sli_ari", "lvg_sin", "sli_sin")
+                     "lvg_ari", "sli_ari", "lvg_sin", "sli_sin",
+                     "lvg_fnorm", "sli_fnorm")
     rownames(df) = NULL
     write.table(df, file = paste0("sim", simtype, "_plat", 
                                   plat, "_n", n, ".txt"), row.names = FALSE)
