@@ -73,6 +73,6 @@ runsim = function(simtype, pobs, plat = NULL, n, iters){
     
     rownames(df) = NULL
     write.table(df, file = paste0("sim", simtype, "_plat", 
-                                  plat, "_n", n, ".txt"), row.names = FALSE)
+                                  plat, "_n", n, "_iters", min(iters), "to", max(iters), ".txt"), row.names = FALSE)
   }
 }
