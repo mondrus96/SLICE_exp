@@ -15,11 +15,6 @@ Rscript -e "
 sapply((paste0('../Models/', list.files('../Models/'))), source)
 sapply((paste0('../Simulations/', list.files('../Simulations/'))), source)
 
-print(paste('plat:', plat))
-print(paste('n:', n))
-print(paste('start:', start))
-print(paste('end:', end))
-
 simtype <- 'rand'
 pobs <- 150 # Number of observed variables for S
 args <- commandArgs(trailingOnly = TRUE)
@@ -27,6 +22,12 @@ plat <- as.integer(args[1])
 n <- as.integer(args[2])
 start <- as.integer(args[3])
 end <- as.integer(args[4])
+
+print(paste('plat:', plat))
+print(paste('n:', n))
+print(paste('start:', start))
+print(paste('end:', end))
+
 iters <- start:end
 
 runsim(simtype, pobs, plat, n, iters)
