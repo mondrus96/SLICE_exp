@@ -56,7 +56,7 @@ L1_shr <- function(a, kappa) {
 }
 
 nucl_shr <- function(a, kappa) {
-  b = eigs(a, ncol(a))
+  b = suppressWarnings(eigs(a, ncol(a)))
   return(b$vectors %*% diag(pmax(0, b$values - kappa)) %*% t(b$vectors))
 }
 
