@@ -1,3 +1,5 @@
+library(RSpectra)
+
 lvglasso <- function(Sigma, lambda, gamma, rho = 1, maxiter = 100, tol = 1e-3){
   p <- ncol(Sigma)
   
@@ -54,7 +56,7 @@ L1_shr <- function(a, kappa) {
 }
 
 nucl_shr <- function(a, kappa) {
-  b = eigen(a)
+  b = eigs(a, ncol(a))
   return(b$vectors %*% diag(pmax(0, b$values - kappa)) %*% t(b$vectors))
 }
 

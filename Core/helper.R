@@ -16,7 +16,7 @@ logL = function(Sigma, S, L){
 # Make a matrix positive definite by adding a small value to diagonal
 makePD = function(mat){
   p = ncol(mat)
-  eigvals = eigen(mat, only.values=T)$values
+  eigvals = eigs(mat, ncol(mat), opts = list(retvec = FALSE))$values
   perturb = max(max(eigvals) - p*min(eigvals), 0)/(p-1)
   mat = mat+diag(p)*perturb
   return(mat)
