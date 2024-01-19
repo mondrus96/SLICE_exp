@@ -10,7 +10,7 @@ lvglasso <- function(Sigma, lambda, gamma, rho = 1, maxiter = 100, tol = 1e-3){
   
   history <- list(objval = c(), r_norm = c(), s_norm = c(), eps_pri = c(), eps_dual = c())
   
-  for (i in 1:maxiter) {
+  for (i in 1:maxiter){
     # R-update
     Rold <- R
     eigout <- eigen(rho * (S - U) - Sigma)
