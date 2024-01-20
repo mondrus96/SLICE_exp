@@ -26,6 +26,7 @@ slice <- function(Sigma, lambda, rank, sest = "glasso",
   E <- invSigma - L # Expectation
   S <- matrix(0, p, p) # Empty S
   
+  deltaS <- c(); deltaL <- c(); deltalogL <- c()
   for(i in 1:maxiter){
     if(!isPD(E)){
       E <- makePD(E) # Make expectation PD
@@ -51,10 +52,10 @@ slice <- function(Sigma, lambda, rank, sest = "glasso",
     E <- (E + t(E))/2
     
     # Convergence check
-    deltaS = norm(S - Sold); deltaL = norm(L - Lold)
-    deltalogL = suppressWarnings(abs(logL(Sigma, S, L) - logL(Sigma, Sold, Lold)))
-    if((deltaS < tol) && (deltaL < tol) || 
-       ifelse(is.na(deltalogL < tol), FALSE, deltalogL < tol)){
+    deltaS <- c(deltaS, norm(S - Sold)); deltaL <- c(deltaL, norm(L - Lold))
+    deltalogL <- c(deltalogL, suppressWarnings(abs(logL(Sigma, S, L) - logL(Sigma, Sold, Lold))))
+    if((deltaS[i] < tol) && (deltaL[i] < tol) || 
+       ifelse(is.na(deltalogL[i] < tol), FALSE, deltalogL[i] < tol)){
       break
     }
   }
