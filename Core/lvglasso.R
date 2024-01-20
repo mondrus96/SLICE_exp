@@ -25,7 +25,10 @@ lvglasso <- function(Sigma, lambda, gamma, rho = 1, maxiter = 100, tol = 1e-3){
     S <- (S + t(S))/2
     
     # L-update
-    Lold <- L 
+    Lold <- L
+    R_S <- R - S
+    save(R_S, file = "currR_S.rda")
+    save(L, file = "currL.rda")
     L <- nucl_shr(R - S, gamma / rho)
     L <- (L + t(L))/2
     
