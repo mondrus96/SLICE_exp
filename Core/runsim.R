@@ -34,9 +34,6 @@ runsim = function(simtype, pobs, plat = NULL, n, iters){
     cvlvg <- cv.lvg(X) # Cross validation
     cvsli <- cv.slice(X)
     
-    currseed <- get(".Random.seed", envir = .GlobalEnv)
-    save(currseed, Sigma, cvlvg$lambda, cvlvg$gamma, file = "currlvg.rda")
-    
     lvg <- lvglasso(Sigma, cvlvg$lambda, cvlvg$gamma) # Best fit
     sli <- slice(Sigma, cvsli$lambda, cvsli$r)
     
