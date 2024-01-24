@@ -1,6 +1,6 @@
 # Extended Bayes Information Criterion
 ebic = function(likl, p, n, k, gamma = 0.5){
-  return(-2*likl + k*log(n) + 2*gamma*log(p/k))
+  return(-2 * likl + k * log(n) + 2 * gamma * k * log(p))
 }
 
 # Bayes Information Criterion

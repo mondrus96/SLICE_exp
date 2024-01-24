@@ -1,6 +1,6 @@
 library(MASS)
 
-runsim = function(simtype, pobs, plat = NULL, n, iters){
+runsim = function(simtype, method, pobs, plat = NULL, n, iters){
   df = c()
   # Loop through 100 iterations of simulation
   for(i in iters){
@@ -31,11 +31,27 @@ runsim = function(simtype, pobs, plat = NULL, n, iters){
     X <- mvrnorm(n, rep(0, pobs), Sigma = Sigma_star) # Finite sample data
     Sigma <- cov(X) # Sample Sigma 
     
-    cvlvg <- cv.lvg(X) # Cross validation
-    cvsli <- cv.slice(X)
+    # Model selection and parameter estimation
+    if(method == "SLICE"){
+      cvsli <- cv.slice(X)
+      sli <- slice(Sigma, cvsli$lambda, cvsli$r)
+      S <- sli$S; L <- sli$L
+    }else if(method == "nnLVGLASSO"){
+      cvnnlvg <- cv.nnlvg(X)
+      nnlvg <- lvglasso(Sigma, cvlvg$lambda, cvlvg$gamma)
+      S <- lvg$S; L <- lvg$L
+    } else if(method == "rcLVGLASSO"){
+      cvrclvg <- cv.rclvg(X)
+      out <- suppressWarnings(lvglasso(cov(train), cvrclvg$r, cvrclvg$lambda, maxit = 100)) # Run method
+      S <- out$wi[p,p]
+      L <- out$wi[1:p,(p+1):(p+rs[i])] %*% out$wi[(p+1):(p+rs[i]),(p+1):(p+rs[i])] %*% out$wi[(p+1):(p+rs[i]),1:p]
+    } else if(method == "tGLASSO"){
+      S <- ebic.tg(X)$S
+    }
     
-    lvg <- lvglasso(Sigma, cvlvg$lambda, cvlvg$gamma) # Best fit
-    sli <- slice(Sigma, cvsli$lambda, cvsli$r)
+    # Sparse
+    
+    
     
     eigLlvg <- eigen(lvg$L) # Eigendecomp
     eigLsli <- eigen(sli$L)

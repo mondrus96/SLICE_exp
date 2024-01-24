@@ -1,13 +1,14 @@
 library(pracma)
+library(lvnet)
 
-cv.slice = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), rs = c(2:6), sest = "glasso"){
+cv.rclvg = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), rs = c(2:6)){
   # X = input data matrix, or Sigma
   # k = number of folds to perform for CV
   # lambdas = list of lambdas values to try
   # rs = list of rs to try
   # sest = sparse estimator - either glasso or clime
   
-  n <- nrow(X) # number of samples
+  p <- ncol(X); n <- nrow(X) # dimensions of X
   cvmat <- matrix(NA, length(rs), length(lambdas)); rownames(cvmat) <- rs; colnames(cvmat) <- lambdas
   
   # Go over grid of lambdas and rs
@@ -21,8 +22,9 @@ cv.slice = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), rs = c(2:6), s
       for(k in 1:folds){
         train <- X[ind != k,]; test <- X[ind == k,] # Train and test sets
         
-        out <- slice(cov(train), lambdas[j], rs[i], sest) # Run method
-        S <- out$S; L <- out$L
+        out <- suppressWarnings(lvglasso(cov(train), rs[i], lambdas[j], maxit = 100)) # Run method
+        S <- out$wi[p,p]
+        L <- out$wi[1:p,(p+1):(p+rs[i])] %*% out$wi[(p+1):(p+rs[i]),(p+1):(p+rs[i])] %*% out$wi[(p+1):(p+rs[i]),1:p]
         
         likl <- logL(cov(test), S, L) # Append to mulogL
         mulogL <- c(mulogL, likl)

@@ -1,6 +1,6 @@
 library(pracma)
 
-cv.lvg = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), gammas = logseq(1e-5, 0.1, 5)){
+cv.nnlvg = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), gammas = logseq(1e-5, 0.1, 5)){
   # X = input data matrix
   # k = number of folds to perform for CV
   # lambdas = list of lambdas values to try
@@ -20,11 +20,11 @@ cv.lvg = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), gammas = logseq(
       for(k in 1:folds){
         train <- X[ind != k,]; test <- X[ind == k,] # Train and test sets
         
-        out <- lvglasso(cov(train), lambdas[j], gammas[i]) # Run method
+        out <- nnlvg(cov(train), lambdas[j], gammas[i]) # Run method
         S <- out$S; L <- out$L
         
-        logL <- logL(cov(test), S, L) # Append to mulogL
-        mulogL <- c(mulogL, logL)
+        likl <- logL(cov(test), S, L) # Append to mulogL
+        mulogL <- c(mulogL, likl)
       }
       cvmat[i, j] <- mean(mulogL)
     }
