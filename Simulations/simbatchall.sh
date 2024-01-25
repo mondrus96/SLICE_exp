@@ -1,8 +1,10 @@
 #!/bin/bash
 
-models=("SLICE" "nnLVGLASSO" "rcLVGLASSO")
-rank=(3 4 5 6)
-n=(75 150 225 300 375)
+models=("SLICE" "tGLASSO" "nnLVGLASSO" "rcLVGLASSO")
+#rank=(3 4 5 6)
+#n=(75 150 225 300 375)
+rank=(4)
+n=(375)
 
 # Loop over model
 for model in "${models[@]}"; do
