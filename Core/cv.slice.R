@@ -5,7 +5,7 @@ cv.slice = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), rs = c(2:6), s
   # k = number of folds to perform for CV
   # lambdas = list of lambdas values to try
   # rs = list of rs to try
-  # sest = sparse estimator - either glasso or clime
+  # sest = sparse estimator - either glasso, clime, or gscad
   
   n <- nrow(X) # number of samples
   cvmat <- matrix(NA, length(rs), length(lambdas)); rownames(cvmat) <- rs; colnames(cvmat) <- lambdas

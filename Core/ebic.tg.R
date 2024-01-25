@@ -1,26 +1,26 @@
 library(glasso)
 
-ebic.tg = function(X, lambda = logseq(1e-5, 0.1, 5), tau = logseq(1e-5, 0.1, 5)){
+ebic.tg = function(X, lambdas = logseq(1e-5, 1e-3, 10), taus = logseq(1e-5, 0.9, 10)){
   # X = input data matrix
   # lambda = vector of lambdas to try
   # tau = vector of thresholds to try
   
   p <- ncol(X); n <- nrow(X) # dimensions of X
   Sigma <- cov(X)
-  ebicmat <- matrix(NA, length(tau), length(lambdas)); rownames(ebicmat) <- tau; colnames(ebicmat) <- lambdas
+  ebicmat <- matrix(NA, length(taus), length(lambdas)); rownames(ebicmat) <- taus; colnames(ebicmat) <- lambdas
   
-  # Go over grid of lambdas
-  for(i in 1:length(lambdas)){
-    print(paste0("lambda: ", lambdas[i]))
-    for(j in 1:length(tau)){
-      print(paste0("tau: ", tau[j]))
+  # Go over grid of taus and lambdas
+  for(i in 1:length(taus)){
+    print(paste0("tau: ", taus[i]))
+    for(j in 1:length(lambdas)){
+      print(paste0("lambda: ", lambdas[j]))
       
       # Fit glasso
-      Theta <- glasso(Sigma, lambdas[i])$wi
+      gout <- glasso(Sigma, lambdas[j])
       
       # Fit threshold
-      S <- Theta
-      S[abs(S) < tau[j]] <- 0
+      S <- gout$wi
+      S[abs(S) <= taus[i]] <- 0
 
       # Calculate EBIC
       likl <- logL(Sigma, S, 0)
@@ -28,12 +28,15 @@ ebic.tg = function(X, lambda = logseq(1e-5, 0.1, 5), tau = logseq(1e-5, 0.1, 5))
       ebicmat[i, j] <- ebic(likl, p, n, k)
     } 
   }
-  best <- which(ebicmat == min(ebicmat), arr.ind = TRUE)
+  best <- which(ebicmat == min(ebicmat, na.rm=TRUE), arr.ind = TRUE)
+  if(nrow(best) > 2){
+    best <- best[1,]
+  }
   
   # Refit
   Theta <- glasso(Sigma, lambdas[best[2]])$wi
-  S[abs(S) < tau[best[1]]] <- 0
+  S[abs(S) < taus[best[1]]] <- 0
   
   return(list(ebicvec = ebicmat, minebic = min(ebicmat), S = S,
-              lambda = lambdas[best[2]], tau = tau[best[1]]))
+              lambda = lambdas[best[2]], tau = taus[best[1]]))
 }

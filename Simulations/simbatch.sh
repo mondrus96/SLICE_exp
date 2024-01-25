@@ -10,7 +10,7 @@
 module load gcc/9.3.0 r/4.3.1
 export R_LIBS=~/local/R_libs/
 
-echo "Received arguments: $1 $2 $3 $4"
+echo "Received arguments: $1 $2 $3 $4 $5"
 
 Rscript -e "
 sapply((paste0('../Core/', list.files('../Core/'))), source)
@@ -22,6 +22,7 @@ plat <- as.integer(args[1])
 n <- as.integer(args[2])
 start <- as.integer(args[3])
 end <- as.integer(args[4])
+model <- as.string(args[5])
 
 print(paste('plat:', plat))
 print(paste('n:', n))
@@ -30,5 +31,5 @@ print(paste('end:', end))
 
 iters <- start:end
 
-runsim(simtype, pobs, plat, n, iters)
-" $1 $2 $3 $4
+runsim(simtype, model, pobs, plat, n, iters)
+" $1 $2 $3 $4 $5

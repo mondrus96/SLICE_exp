@@ -1,7 +1,7 @@
 library(MASS)
 
 runsim = function(simtype, method, pobs, plat = NULL, n, iters){
-  df = c()
+  S_hats <- L_hats <- S_stars <- L_stars <- z_stars <- vector("list", length(iters))
   # Loop through 100 iterations of simulation
   for(i in iters){
     print(paste0("SIM ITER ", i))
@@ -36,58 +36,25 @@ runsim = function(simtype, method, pobs, plat = NULL, n, iters){
       cvsli <- cv.slice(X)
       sli <- slice(Sigma, cvsli$lambda, cvsli$r)
       S <- sli$S; L <- sli$L
-    }else if(method == "nnLVGLASSO"){
+    } else if(method == "nnLVGLASSO"){
       cvnnlvg <- cv.nnlvg(X)
-      nnlvg <- lvglasso(Sigma, cvlvg$lambda, cvlvg$gamma)
-      S <- lvg$S; L <- lvg$L
+      nnlvg <- nnlvg(Sigma, cvnnlvg$lambda, cvnnlvg$gamma)
+      S <- nnlvg$S; L <- nnlvg$L
     } else if(method == "rcLVGLASSO"){
       cvrclvg <- cv.rclvg(X)
-      out <- suppressWarnings(lvglasso(cov(train), cvrclvg$r, cvrclvg$lambda, maxit = 100)) # Run method
-      S <- out$wi[p,p]
-      L <- out$wi[1:p,(p+1):(p+rs[i])] %*% out$wi[(p+1):(p+rs[i]),(p+1):(p+rs[i])] %*% out$wi[(p+1):(p+rs[i]),1:p]
+      rclvg <- suppressWarnings(lvglasso(Sigma, cvrclvg$r, cvrclvg$lambda, maxit = 100)) # Run method
+      S <- rclvg$wi[p,p]
+      L <- rclvg$wi[1:p,(p+1):(p+rs[i])] %*% rclvg$wi[(p+1):(p+rs[i]),(p+1):(p+rs[i])] %*% rclvg$wi[(p+1):(p+rs[i]),1:p]
     } else if(method == "tGLASSO"){
       S <- ebic.tg(X)$S
+      L <- NULL
     }
     
-    # Sparse
+    # Append to all outputs
+    S_hats[[i]] <- S; L_hats[[i]] <- L; S_stars[[i]] <- S_star; L_stars[[i]] <- L_star; z_stars[[i]] <- z_star
     
-    
-    
-    eigLlvg <- eigen(lvg$L) # Eigendecomp
-    eigLsli <- eigen(sli$L)
-    eigL_star <- eigen(L_star)
-    
-    lvg_sin <- sintheta(eigL_star$vectors[,1], eigLlvg$vectors[,1]) # Sin angle
-    sli_sin <- sintheta(eigL_star$vectors[,1], eigLsli$vectors[,1])
-    
-    lvg_fnorm <- norm(L_star - lvg$L) # Frobenius norm
-    sli_fnorm <- norm(L_star - sli$L)
-    
-    if(simtype %in% c("exp", "rand")){
-      z_lvg <- kmeans(eigLlvg$vectors[,1:plat], plat, 1000)$cluster # Cluster predictions
-      z_sli <- kmeans(eigLsli$vectors[,1:plat], plat, 1000)$cluster
-      
-      lvg_nmi <- nmi(z_star, z_lvg) # NMI
-      sli_nmi <- nmi(z_star, z_sli) 
-      
-      lvg_ari <- ari(z_star, z_lvg) # ARI
-      sli_ari <- ari(z_star, z_sli)
-      
-      df = rbind(df, c(plat, n, lvg_nmi, sli_nmi, 
-                       lvg_ari, sli_ari, lvg_sin, sli_sin,
-                       lvg_fnorm, sli_fnorm))
-      colnames(df) = c("plat", "n", "lvg_nmi", "sli_nmi",
-                       "lvg_ari", "sli_ari", "lvg_sin", "sli_sin",
-                       "lvg_fnorm", "sli_fnorm")
-    } else{
-      df = rbind(df, c(plat, n, lvg_sin, sli_sin,
-                       lvg_fnorm, sli_fnorm))
-      colnames(df) = c("plat", "n", "lvg_sin", "sli_sin",
-                       "lvg_fnorm", "sli_fnorm")
-    }
-    
-    rownames(df) = NULL
-    write.table(df, file = paste0("sim", simtype, "_plat", 
-                                  plat, "_n", n, "_iters", min(iters), "to", max(iters), ".txt"), row.names = FALSE)
+    # Save as rda
+    save(S_hats, L_hats, S_stars, L_stars, z_stars, file = paste0(method, "/", method, "_sim", simtype, "_plat", 
+                                  plat, "_n", n, "_iters", min(iters), "to", max(iters), ".rda"))
   }
 }
