@@ -59,9 +59,9 @@ nucl_shr <- function(a, kappa){
   tryCatch({
     a = eigen(a, symmetric = TRUE)
   }, error = function(e){
-    print(a)
     a = a + 0.1*diag(ncol(a))
     a = eigen(a, symmetric = TRUE)
+    print(a)
   })
   return(a$vectors %*% diag(pmax(0, a$values - kappa)) %*% t(a$vectors))
 }
