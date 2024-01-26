@@ -19,7 +19,9 @@ rclvg <- function(Sigma, lambda, nLatents, tol = 1e-3, maxiter = 100){
   for(iter in 1:maxiter){
     expS <- as.matrix(forceSymmetric(Estep(Sigma, K, O, H))) # E step
     K <- as.matrix(forceSymmetric(Mstep(expS, O, lambda))) # M step
-    K <- forcePositive(K) 
+    if(!isPD(K)){
+      K <- makePD(K)
+    }
     
     S <- K[O,O]; L <- K[O,H] %*% K[H,H] %*% K[H,O] # Define S and L
     
@@ -68,14 +70,6 @@ Mstep <- function(expS, O, lambda){
   
   K <- glasso(expS, RhoMat, penalize.diagonal=FALSE)$wi
   return(K)  
-}
-
-forcePositive <- function(x){
-  if(any(eigen(x)$values<0)){
-    cov2cor(x - (min(eigen(x)$values)-.1) * diag(nrow(x)))
-  } else {
-    x
-  }
 }
 
 forceSymmetric <- function(x){
