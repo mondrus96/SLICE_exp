@@ -17,11 +17,11 @@ rclvg <- function(Sigma, lambda, nLatents, tol = 1e-3, maxiter = 100){
   Sold <- K[O,O]; Lold <- K[O,H] %*% K[H,H] %*% K[H,O] # Define S and L
   
   for(iter in 1:maxiter){
-    expS <- as.matrix(forceSymmetric(Estep(Sigma, K, O, H))) # E step
-    K <- as.matrix(forceSymmetric(Mstep(expS, O, lambda))) # M step
     if(!isPD(K)){
       K <- makePD(K)
     }
+    expS <- as.matrix(forceSymmetric(Estep(Sigma, K, O, H))) # E step
+    K <- as.matrix(forceSymmetric(Mstep(expS, O, lambda))) # M step
     
     S <- K[O,O]; L <- K[O,H] %*% K[H,H] %*% K[H,O] # Define S and L
     
