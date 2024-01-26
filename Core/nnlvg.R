@@ -57,11 +57,11 @@ L1_shr <- function(a, kappa){
 
 nucl_shr <- function(a, kappa){
   tryCatch({
-    a = suppressWarnings(eigs(a, ncol(a)))
+    a = eigen(a, symmetric = TRUE)
   }, error = function(e){
     print(a)
     a = a + 0.1*diag(ncol(a))
-    a = suppressWarnings(eigs(a, ncol(a)))
+    a = eigen(a, symmetric = TRUE)
   })
   return(a$vectors %*% diag(pmax(0, a$values - kappa)) %*% t(a$vectors))
 }
