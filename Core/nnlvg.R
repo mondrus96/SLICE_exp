@@ -60,7 +60,7 @@ nucl_shr <- function(a, kappa){
     a = suppressWarnings(eigs(a, ncol(a)))
   }, error = function(e){
     print(a)
-    a = a + diag(rep(0.01, ncol(a)))
+    a = a + 0.1*diag(ncol(a))
     a = suppressWarnings(eigs(a, ncol(a)))
   })
   return(a$vectors %*% diag(pmax(0, a$values - kappa)) %*% t(a$vectors))
