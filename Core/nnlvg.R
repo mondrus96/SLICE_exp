@@ -56,7 +56,6 @@ L1_shr <- function(a, kappa){
 }
 
 nucl_shr <- function(a, kappa, tol){
-  print(det(a))
   if(det(a) < tol){
     return(a)
   } else{
