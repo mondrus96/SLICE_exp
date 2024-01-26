@@ -60,7 +60,7 @@ Estep <- function(Sigma, Kcur, O, H){
 # M-step in the optimization algorithm:
 Mstep <- function(expS, O, lambda){
   if (!isPD(expS)){
-    expS <- as.matrix(forcePositive(expS))
+    expS <- as.matrix(makePD(expS))
   }
   # Rho matrix
   n <- nrow(expS)
