@@ -59,7 +59,7 @@ nucl_shr <- function(a, kappa){
   tryCatch({
     a = suppressWarnings(eigs(a, ncol(a)))
   }, error = function(e){
-    a = makePD(a)
+    a = a + diag(rep(0.01, ncol(a)))
     a = suppressWarnings(eigs(a, ncol(a)))
   })
   return(a$vectors %*% diag(pmax(0, a$values - kappa)) %*% t(a$vectors))
