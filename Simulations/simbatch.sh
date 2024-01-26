@@ -22,7 +22,7 @@ plat <- as.integer(args[1])
 n <- as.integer(args[2])
 start <- as.integer(args[3])
 end <- as.integer(args[4])
-model <- as.string(args[5])
+model <- as.character(args[5])
 
 print(paste('plat:', plat))
 print(paste('n:', n))
