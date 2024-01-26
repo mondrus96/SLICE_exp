@@ -1,10 +1,9 @@
 #!/bin/bash
 
-models=("SLICE" "tGLASSO" "nnLVGLASSO" "rcLVGLASSO")
-#rank=(3 4 5 6)
-#n=(75 150 225 300 375)
-rank=(4)
-n=(375)
+#models=("SLICE" "tGLASSO" "nnLVGLASSO" "rcLVGLASSO")
+models=("nnLVGLASSO")
+rank=(3 4 5 6)
+n=(75 150 225 300 375)
 
 # Loop over model
 for model in "${models[@]}"; do
@@ -19,7 +18,7 @@ for model in "${models[@]}"; do
                 end=$((25 * i))
 
                 # Submit the job to SLURM with Rscript arguments
-                sbatch --job-name="${model}_plat${plat}_n${num}_batch${i}" simbatch.sh $plat $num $start $end $model
+                sbatch --job-name="${model}_plat${plat}_n${num}_batch${i}" --time=0-06:00 simbatch.sh $plat $num $start $end $model
                 sleep 1
             done
         done
