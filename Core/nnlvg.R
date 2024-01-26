@@ -62,7 +62,7 @@ nucl_shr <- function(a, kappa){
     a = a + 0.1*diag(ncol(a))
     a = eigen(a, symmetric = TRUE)
   })
-  print(a)
+  print(names(a))
   return(a$vectors %*% diag(pmax(0, a$values - kappa)) %*% t(a$vectors))
 }
 
