@@ -57,12 +57,12 @@ L1_shr <- function(a, kappa){
 
 nucl_shr <- function(a, kappa){
   tryCatch({
-    b = suppressWarnings(eigs(a, ncol(a)))
+    a = suppressWarnings(eigs(a, ncol(a)))
   }, error = function(e){
-    b = makePD(b)
-    b = suppressWarnings(eigs(a, ncol(a)))
+    a = makePD(a)
+    a = suppressWarnings(eigs(a, ncol(a)))
   })
-  return(b$vectors %*% diag(pmax(0, b$values - kappa)) %*% t(b$vectors))
+  return(a$vectors %*% diag(pmax(0, a$values - kappa)) %*% t(a$vectors))
 }
 
 nucl_norm <- function(mat){
