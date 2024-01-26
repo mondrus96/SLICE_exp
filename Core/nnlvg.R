@@ -26,7 +26,7 @@ nnlvg <- function(Sigma, lambda, gamma, rho = 1, maxiter = 100, tol = 1e-3){
     
     # L-update
     Lold <- L
-    L <- nucl_shr(R - S, gamma / rho)
+    L <- nucl_shr(R - S, gamma / rho, tol)
     L <- (L + t(L))/2
     
     # Update dual variable
@@ -55,7 +55,7 @@ L1_shr <- function(a, kappa){
   return(sign(a) * pmax(0, abs(a) - kappa))
 }
 
-nucl_shr <- function(a, kappa){
+nucl_shr <- function(a, kappa, tol){
   print(det(a))
   if(det(a) < tol){
     return(a)
