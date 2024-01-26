@@ -41,7 +41,7 @@ runsim = function(simtype, method, pobs, plat = NULL, n, iters){
       nnlvg <- nnlvg(Sigma, cvnnlvg$lambda, cvnnlvg$gamma)
       S <- nnlvg$S; L <- nnlvg$L
     } else if(method == "rcLVGLASSO"){
-      cvrclvg <- cv.rclvg(X, 3, c(0.01, 0.1), c(2, 4))
+      cvrclvg <- cv.rclvg(X)
       rclvg <- rclvg(Sigma, cvrclvg$lambda, cvrclvg$r)
       S <- rclvg$S; L <- rclvg$L
     } else if(method == "tGLASSO"){
