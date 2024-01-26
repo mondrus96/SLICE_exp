@@ -3,15 +3,15 @@ library(glasso)
 library(RSpectra)
 
 # Main slice estimator
-slice <- function(Sigma, lambda, rank, sest = "glasso",
+slice <- function(Sigma, lambda, rank, Sest = "glasso",
                   tol = 1e-3, maxiter = 100, randinit = FALSE){
   # Sigma = the input covariance matrix
   # lambda = regularization parameter for clime/graphical lasso
   # rank = rank
-  # sest = sparse estimator - glasso or clime
+  # Sest = sparse estimator - glasso or clime
   
-  if(!sest %in% c("glasso", "clime")){
-    stop(paste(sest, "is not a valid sparse model"))
+  if(!Sest %in% c("glasso", "clime")){
+    stop(paste(Sest, "is not a valid sparse model"))
   }
   
   p <- ncol(Sigma) # Make Sigma PD
@@ -33,12 +33,10 @@ slice <- function(Sigma, lambda, rank, sest = "glasso",
     }
     
     Sold <- S # Sparse step
-    if(sest == "glasso"){
+    if(Sest == "glasso"){
       S <- glasso(solve(E), lambda, thr = tol, maxit = maxiter)$wi  
-    } else if(sest == "clime"){
+    } else if(Sest == "clime"){
       S <- clime(solve(E), lambda, sigma = TRUE)$Omegalist[[1]]
-    } else if(sest){
-      
     }
     S <- (S + t(S))/2
     
@@ -53,7 +51,7 @@ slice <- function(Sigma, lambda, rank, sest = "glasso",
     
     # Convergence check
     deltaS <- c(deltaS, norm(S - Sold)); deltaL <- c(deltaL, norm(L - Lold))
-    deltalogL <- c(deltalogL, suppressWarnings(abs(logL(Sigma, S, L) - logL(Sigma, Sold, Lold))))
+    deltalogL <- c(deltalogL, suppressWarnings(abs(logL(Sigma, S + L) - logL(Sigma, Sold + Lold))))
     if((deltaS[i] < tol) && (deltaL[i] < tol) || 
        ifelse(is.na(deltalogL[i] < tol), FALSE, deltalogL[i] < tol)){
       break

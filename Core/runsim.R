@@ -41,10 +41,9 @@ runsim = function(simtype, method, pobs, plat = NULL, n, iters){
       nnlvg <- nnlvg(Sigma, cvnnlvg$lambda, cvnnlvg$gamma)
       S <- nnlvg$S; L <- nnlvg$L
     } else if(method == "rcLVGLASSO"){
-      cvrclvg <- cv.rclvg(X)
-      rclvg <- suppressWarnings(lvglasso(Sigma, cvrclvg$r, cvrclvg$lambda, maxit = 100)) # Run method
-      S <- rclvg$wi[p,p]
-      L <- rclvg$wi[1:p,(p+1):(p+rs[i])] %*% rclvg$wi[(p+1):(p+rs[i]),(p+1):(p+rs[i])] %*% rclvg$wi[(p+1):(p+rs[i]),1:p]
+      cvrclvg <- cv.rclvg(X, 3, c(0.01, 0.1), c(2, 4))
+      rclvg <- rclvg(Sigma, cvrclvg$lambda, cvrclvg$r)
+      S <- rclvg$S; L <- rclvg$L
     } else if(method == "tGLASSO"){
       S <- ebic.tg(X)$S
       L <- NULL

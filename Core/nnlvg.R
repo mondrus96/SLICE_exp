@@ -47,20 +47,25 @@ nnlvg <- function(Sigma, lambda, gamma, rho = 1, maxiter = 100, tol = 1e-3){
   list(S = S, L = L, history = history)
 }
 
-objective <- function(Sigma, R, S, L, lambda, gamma) {
+objective <- function(Sigma, R, S, L, lambda, gamma){
   return(sum(diag(Sigma %*% R)) - log(det(R)) + lambda * sum(abs(S)) + gamma * nucl_norm(L))
 }
 
-L1_shr <- function(a, kappa) {
+L1_shr <- function(a, kappa){
   return(sign(a) * pmax(0, abs(a) - kappa))
 }
 
-nucl_shr <- function(a, kappa) {
-  b = suppressWarnings(eigs(a, ncol(a)))
+nucl_shr <- function(a, kappa){
+  tryCatch({
+    b = suppressWarnings(eigs(a, ncol(a)))
+  }, error = function(e){
+    b = makePD(b)
+    b = suppressWarnings(eigs(a, ncol(a)))
+  })
   return(b$vectors %*% diag(pmax(0, b$values - kappa)) %*% t(b$vectors))
 }
 
-nucl_norm <- function(mat) {
+nucl_norm <- function(mat){
   s <- eigen(mat)$values  # Get the singular values
   return(sum(abs(s)))  # Return the sum of the singular values
 }

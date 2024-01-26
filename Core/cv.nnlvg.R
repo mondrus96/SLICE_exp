@@ -23,13 +23,16 @@ cv.nnlvg = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), gammas = logse
         out <- nnlvg(cov(train), lambdas[j], gammas[i]) # Run method
         S <- out$S; L <- out$L
         
-        likl <- logL(cov(test), S, L) # Append to mulogL
+        likl <- logL(cov(test), S + L) # Append to mulogL
         mulogL <- c(mulogL, likl)
       }
       cvmat[i, j] <- mean(mulogL)
     }
   }
-  best <- which(cvmat == max(cvmat), arr.ind = TRUE)
+  best <- which(cvmat == max(cvmat, na.rm=TRUE), arr.ind = TRUE)
+  if(nrow(best) > 2){
+    best <- best[1,]
+  }
   
   return(list(cvmat = cvmat, maxlogL = max(cvmat), 
               lambda = lambdas[best[2]], gamma = gammas[best[1]]))

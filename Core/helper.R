@@ -9,8 +9,8 @@ bic = function(likl, n, k){
 }
 
 # Log likelihood function
-logL = function(Sigma, S, L){
-  return(log(det(S + L)) - sum(diag(Sigma %*% (S + L))))
+logL = function(Sigma, invSigmahat){
+  return(log(det(invSigmahat)) - sum(diag(Sigma %*% (invSigmahat))))
 }
 
 # Make a matrix positive definite by adding a small value to diagonal
@@ -125,4 +125,34 @@ pair_confusion_matrix <- function(labels_true, labels_pred) {
   cmat[1, 1] <- n_samples^2 - cmat[1, 2] - cmat[2, 1] - sum_squares
   
   return(cmat) # Return contingency table
+}
+
+F1score <- function(S_star, S_hat){
+  labels_true <- S_star[upper.tri(S_star)]; labels_pred <- S_hat[upper.tri(S_hat)]
+  labels_true <- labels_true != 0; labels_pred <- labels_pred != 0
+  
+  TP <- sum(labels_true == 1 & labels_pred == 1)
+  FP <- sum(labels_true == 0 & labels_pred == 1)
+  FN <- sum(labels_true == 1 & labels_pred == 0)
+  
+  prec <- TP/(TP + FP)
+  rec <- TP/(TP + FN)
+  
+  return(2 * (prec * rec) / (prec + rec))
+}
+
+TPrate <- function(S_star, S_hat){
+  labels_true <- S_star[upper.tri(S_star)]; labels_pred <- S_hat[upper.tri(S_hat)]
+  labels_true <- labels_true != 0; labels_pred <- labels_pred != 0
+  
+  TP <- sum(labels_true == 1 & labels_pred == 1)
+  return(TP/sum(labels_true == 1))
+}
+
+TNrate <- function(S_star, S_hat){
+  labels_true <- S_star[upper.tri(S_star)]; labels_pred <- S_hat[upper.tri(S_hat)]
+  labels_true <- labels_true != 0; labels_pred <- labels_pred != 0
+  
+  TN <- sum(labels_true == 0 & labels_pred == 0)
+  return(TN/sum(labels_true == 0))
 }

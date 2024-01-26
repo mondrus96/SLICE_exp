@@ -22,17 +22,19 @@ cv.rclvg = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), rs = c(2:6)){
       for(k in 1:folds){
         train <- X[ind != k,]; test <- X[ind == k,] # Train and test sets
         
-        out <- suppressWarnings(lvglasso(cov(train), rs[i], lambdas[j], maxit = 100)) # Run method
-        S <- out$wi[p,p]
-        L <- out$wi[1:p,(p+1):(p+rs[i])] %*% out$wi[(p+1):(p+rs[i]),(p+1):(p+rs[i])] %*% out$wi[(p+1):(p+rs[i]),1:p]
+        out <- rclvg(cov(train), lambdas[j], rs[i]) # Run method
+        S <- out$S; L <- out$L
         
-        likl <- logL(cov(test), S, L) # Append to mulogL
+        likl <- logL(cov(test), S + L) # Append to mulogL
         mulogL <- c(mulogL, likl)
       }
       cvmat[i, j] <- mean(mulogL) 
     }
   }
-  best <- which(cvmat == max(cvmat), arr.ind = TRUE)
+  best <- which(cvmat == max(cvmat, na.rm=TRUE), arr.ind = TRUE)
+  if(nrow(best) > 2){
+    best <- best[1,]
+  }
   
   return(list(cvmat = cvmat, maxlogL = max(cvmat), 
               lambda = lambdas[best[2]], r = rs[best[1]]))

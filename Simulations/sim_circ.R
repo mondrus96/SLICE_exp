@@ -7,5 +7,5 @@ iters <- 1:100
 
 models <- c("SLICE", "nnLVGLASSO", "tGLASSO", "rcLVGLASSO")
 for(i in models){
-  runsim(simtype, i, pobs, plat, n, iters) 
+  runsim(simtype, i, pobs, plat, n, iters)
 }
