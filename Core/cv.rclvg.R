@@ -1,5 +1,4 @@
 library(pracma)
-library(lvnet)
 
 cv.rclvg = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), rs = c(2:6)){
   # X = input data matrix, or Sigma
