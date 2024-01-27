@@ -4,7 +4,7 @@ sims=("cres" "spir" "rand")
 plats=(2 2 4)
 
 # Loop over n
-for i in {1..3}; do
+for i in {0..2}; do
     sim=${sims[i]}
     plat=${plats[i]}
     # Loop over iterations
