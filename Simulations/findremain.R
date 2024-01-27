@@ -31,4 +31,4 @@ for(model in models){
   }
 }
 # Save as table
-write.table(df, file = "remain.txt", col.names = FALSE, row.names = FALSE)
+write.table(df, file = "remain.txt", col.names = FALSE, row.names = FALSE, quote = FALSE)
