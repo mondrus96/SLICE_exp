@@ -7,8 +7,8 @@ do
     echo "Submitting: $model, $plat, $num, $i"
 
     # Define start and end
-    start=$(1 + 25 * (i - 1))
-    end=$(25 * i)
+    start=$((1 + 25 * (i - 1)))
+    end=$((25 * i))
 
     # Submit the job to SLURM with Rscript arguments
     sbatch --job-name="${model}_plat${plat}_n${num}_batch${i}" --time=0-23:00 simbatch.sh $plat $num $start $end $model
