@@ -9,26 +9,17 @@
 module load gcc/9.3.0 r/4.3.1
 export R_LIBS=~/local/R_libs/
 
-echo "Received arguments: $1 $2 $3 $4 $5"
+echo "Received arguments: $1 $2 $3 $4"
 
 Rscript -e "
-sapply((paste0('../Core/', list.files('../Core/'))), source)
+sapply((paste0("../Core/", list.files("../Core/"))), source)
 
-simtype <- 'rand'
 pobs <- 150 # Number of observed variables for S
-args <- commandArgs(trailingOnly = TRUE)
-plat <- as.integer(args[1])
-n <- as.integer(args[2])
+n <- 10000 # Number of observations
+simtype <- as.character(args[1])
+plat <- as.integer(args[2])
 start <- as.integer(args[3])
 end <- as.integer(args[4])
-model <- as.character(args[5])
 
-print(paste('plat:', plat))
-print(paste('n:', n))
-print(paste('start:', start))
-print(paste('end:', end))
-
-iters <- start:end
-
-runsim(simtype, model, pobs, plat, n, iters)
-" $1 $2 $3 $4 $5
+runsim(simtype, "rcLVGLASSO", pobs, plat, n, start:end) 
+" $1 $2 $3 $4

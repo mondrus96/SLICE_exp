@@ -2,111 +2,109 @@ library(MASS)
 library(ggplot2)
 library(tidyr)
 library(dplyr)
-library(viridis)
+library(Matrix)
 sapply((paste0("../Core/", list.files("../Core/"))), source)
 
 # Get file names
-files <- list.files("../Simulations", "_n")
-files <- files[!grepl("n10000", files)]
-
-# Check which files are missing
-rank <- c(3, 4, 5, 6)
-n <- c(75, 150, 225, 300, 375)
-allsims <- c()
-for(plat in rank){
-  for(num in n){
-    for(i in 1:4){
-      start <- (1 + 25 * (i - 1)); end <- 25 * i
-      allsims <- c(allsims, paste0("simrand_plat", plat, "_n", 
-                                   num, "_iters", start, "to", end, ".txt"))
+plats <- 3:6; ns <- seq(75, 375, 75)
+models <- c("SLICE", "nnLVGLASSO", "tGLASSO", "rcLVGLASSO")
+allsims <- data.frame()
+for(model in models){
+  files <- list.files(paste0("../Simulations/", model))
+  files <- files[!grepl("n10000", files)]
+  for(plat in plats){
+    for(n in ns){
+      print(paste0("model:", model, ", plat:", plat, ", n:", n))
+      currfiles <- files
+      currfiles <- currfiles[grepl(paste0("plat", plat), files) & 
+                             grepl(paste0("n", n), files)]
+      for(j in 1:length(currfiles)){
+        load(paste0("../Simulations/", model, "/", currfiles[j]))
+        simtype <- strsplit(files[j], "_")[[1]][2]
+        
+        iters <- which(!sapply(S_stars, is.null))
+        F1 <- sin_theta <- frob_norm <- spec_norm <- ARI <- rep(NA, length(iters))
+        i <- 1
+        for(k in iters){
+          # Sparse metrics
+          F1[i] <- F1score(S_stars[[k]], S_hats[[k]])
+          
+          # Low rank metrics
+          if(model != "tGLASSO"){
+            eigL_hat <- eigen(L_hats[[k]])
+            eigL_star <- eigen(L_stars[[k]])
+            
+            # Sin theta
+            sin_theta[i] <- sintheta(eigL_star$vectors[,1], eigL_hat$vectors[,1])
+            
+            # Frobenius norm
+            frob_norm[i] <- norm(L_stars[[k]] - L_hats[[k]])
+            
+            # The spectral norm
+            eigDiff <- eigen(L_stars[[k]] - L_hats[[k]])
+            spec_norm[i] <- eigDiff$values[1]
+            
+            # Do kmeans clustering
+            z_hat <- kmeans(eigL_hat$vectors[,1:plat], max(z_stars[[k]]), iter.max = 100, nstart = 1000)$cluster
+            ARI[i] <- ari(z_stars[[k]], z_hat)
+          }
+          i <- i + 1
+        }
+        # Get the 
+        allsims <- rbind(allsims, cbind(model, plat, n, iters, F1, sin_theta, frob_norm, spec_norm, ARI)) # Add to df
+        save(allsims, file = "lowNdf.rda")
+      }
     }
   }
 }
 
-# Didn't run
-print(allsims[!(allsims %in% files)])
-
-# Loop through files
-df <- c()
-incomp <- c()
-for(i in 1:length(files)){
-  sim <- read.table(paste0("../Simulations/", files[i]), header = TRUE)
-  if(nrow(sim) < 25){
-    incomp <- c(incomp, files[i])
-  }
-  df <- rbind(df, sim)
-}
-# Started, but didn't complete
-print(incomp)
+# Get summary values
+rm(list = setdiff(ls(), "allsims"))
+allsims <- allsims %>%
+  mutate(plat = as.numeric(plat),
+         n = as.numeric(n),
+         F1 = as.numeric(F1),
+         sin_theta = as.numeric(sin_theta),
+         frob_norm = as.numeric(frob_norm),
+         spec_norm = as.numeric(spec_norm),
+         ARI = as.numeric(ARI))
+save(allsims, file = "lowNdf.rda")
 
 # Summarize
-df <- df %>%
-  group_by(plat, n) %>%
-  summarise(across(c(lvg_nmi, lvg_ari, lvg_sin, lvg_fnorm, 
-                     sli_nmi, sli_ari, sli_sin, sli_fnorm), mean, na.rm = TRUE))
-
-# Function to plot and save heatmaps
-plot_and_save_heatmap <- function(data, value, filename_prefix, scale_limits){
-  data <- data[,colnames(data) %in% c("plat", "n", value)]
-  colnames(data)[3] <- "value"
-  p <- ggplot(data, aes(plat, n, fill = value)) +
-    geom_tile() + scale_fill_viridis(limits = scale_limits, alpha = 0.8) + 
-    geom_text(aes(label = round(value, 2)), vjust = 0.5, hjust = 0.5) +
-    labs(x = "plat", y = "n", title = paste0(value)) +
-    theme(axis.text.x = element_text(size = 12),
-          axis.text.y = element_text(size = 12),                       
-          axis.ticks = element_blank(), 
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          panel.background = element_rect(fill = "white", colour = NA),
-          plot.title = element_text(hjust = 0.5),
-          panel.border = element_blank())
-  
-  ggsave(paste0(value, ".png"), plot = p, width = 8, height = 6, dpi = 300)
-}
+df <- allsims %>%
+  group_by(model, plat, n) %>%
+  summarise(across(c(F1, sin_theta, frob_norm, spec_norm, ARI), mean, na.rm = TRUE))
+write.table(df, file = "lowNmean.txt")
+sd_df <- allsims %>%
+  group_by(model, plat, n) %>%
+  summarise(across(c(F1, sin_theta, frob_norm, spec_norm, ARI), sd, na.rm = TRUE))
+write.table(sd_df, file = "lowNsd.txt")
 
 # Function to plot and save line grahps
 plot_and_save_lines <- function(df, value){
   subdf <- df %>%
-    select(plat, n, contains(value))
-  
-  # Reshape data to long format
-  longsubdf <- subdf %>%
-    pivot_longer(cols = starts_with(paste0("lvg_", value)) | starts_with(paste0("sli_", value)), 
-                 names_to = "method", values_to = value) %>%
-    mutate(method = gsub(paste0("_", value), "", method))
+    select(model, plat, n, contains(value))
   
   # Calculate the mean for each group
-  colnames(longsubdf)[4] <- "value"
-  meansubdf <- longsubdf %>%
-    group_by(plat, n, method) %>%
-    summarise(mean_val = mean(value, na.rm = TRUE))
+  colnames(subdf)[4] <- "value"
+  
+  # Remove rows for tGLASSO if not calculating sparse
+  if(value != "F1"){
+    subdf <- subdf[subdf$model != "tGLASSO",]
+  }
   
   # Create the plot
-  p <- ggplot(meansubdf, aes(x = n, y = mean_val, group = interaction(method, plat), color = as.factor(plat), linetype = method)) +
+  p <- ggplot(subdf, aes(x = n, y = value, group = interaction(model, plat), color = as.factor(plat), linetype = model)) +
     geom_line() +
-    geom_point(aes(shape = method)) +
-    scale_shape_manual(values = c("lvg" = 15, "sli" = 17)) +  # 15: filled square, 17: filled triangle
-    scale_linetype_manual(values = c("lvg" = "solid", "sli" = "dashed")) +
-    labs(x = "n", y = vals[i], color = "Plat", linetype = "Method", shape = "Method") +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+    geom_point(aes(shape = model)) +
+    labs(x = "n", y = value, color = "Rank of Latent", linetype = "Model", shape = "Model") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1), panel.border = element_blank())
   ggsave(paste0(value, ".png"), plot = p, width = 8, height = 6, dpi = 300)
 }
 
 # List of values to loop through
-values <- c("nmi", "ari", "sin", "fnorm")
-limits_list <- list(c(0, 1), c(0, 1), c(0, 1), c(0, 200))
-
-# Loop through each method and each value
-for(method in c("lvg", "sli")) {
-  for(i in seq_along(values)) {
-    value <- paste(method, values[i], sep = "_")
-    plot_and_save_heatmap(df, value, method, limits_list[[i]])
-  }
-}
-
-vals <- c("nmi", "ari", "sin", "fnorm")
+vals <- c("F1", "sin_theta", "frob_norm", "spec_norm", "ARI")
 for(i in 1:length(vals)){
   plot_and_save_lines(df, vals[i])
 }

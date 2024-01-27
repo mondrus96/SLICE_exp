@@ -35,7 +35,7 @@ plot_and_save <- function(data_list, file_name, xlab, ylab) {
     geom_line() +
     labs(x = xlab, y = ylab) +
     theme_minimal() +
-    theme(legend.title = element_blank())  # Optional: Remove the legend title
+    theme(legend.title = element_blank()) 
   
   # Save the plot as a PNG file
   png(filename = file_name, width = 2000, height = 1400, res = 300)

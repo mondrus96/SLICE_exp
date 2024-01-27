@@ -125,6 +125,8 @@ Lspir <- function(p, sd = 0){
   
   X <- 0.3*cbind(radius * cos(theta), radius * sin(theta))# Define X
   
+  X <- X + matrix(rnorm(prod(dim(X)), mean = 0, sd = sd), nrow = nrow(X), ncol = ncol(X))
+  
   indices <- sample(1:nrow(X)) # Permute indices
   X <- X[indices,]
   

@@ -1,60 +1,74 @@
-library(MASS)
 library(ggplot2)
 library(dplyr)
+library(Matrix)
+
+### Getting Summary Values ###
 sapply((paste0("../Core/", list.files("../Core/"))), source)
-
 # Get file names
-files <- list.files("../Simulations", "n10000")
-
-# Loop through files
-allsims <- c()
-for(i in 1:length(files)){
-  simtype <- strsplit(strsplit(files[i], "_")[[1]], "sim")[[1]][2]
-  df <- cbind(simtype, read.table(paste0("../Simulations/", files[i]), header = TRUE))
-  df <- df[!colnames(df) %in% c("lvg_nmi", "sli_nmi", "lvg_ari", "sli_ari")]
-  allsims <- rbind(allsims, df)
+models <- c("SLICE", "nnLVGLASSO", "tGLASSO", "rcLVGLASSO")
+allsims <- data.frame()
+for(model in models){
+  files <- list.files(paste0("../Simulations/", model, "/"), "n10000")
+  for(j in 1:length(files)){
+    load(paste0("../Simulations/", model, "/", files[j]))
+    simtype <- strsplit(files[j], "_")[[1]][2]
+    plat <- as.numeric(strsplit(strsplit(files[j], "_")[[1]][3], "plat")[[1]][2])
+    
+    # Loop through each one
+    iters <- which(!sapply(S_stars, is.null))
+    F1 <- TP <- TN <- sin_theta <- frob_norm <- spec_norm <- ARI <- rep(NA, length(iters))
+    for(k in 1:length(iters)){
+      # Sparse metrics
+      F1[k] <- F1score(S_stars[[k]], S_hats[[k]])
+      TP[k] <- TPrate(S_stars[[k]], S_hats[[k]])
+      TN[k] <- TNrate(S_stars[[k]], S_hats[[k]])
+      
+      # Low rank metrics
+      if(model != "tGLASSO"){
+        eigL_hat <- eigen(L_hats[[k]])
+        eigL_star <- eigen(L_stars[[k]])
+        
+        # Sin theta
+        sin_theta[k] <- sintheta(eigL_star$vectors[,1], eigL_hat$vectors[,1])
+        
+        # Frobenius norm
+        frob_norm[k] <- norm(L_stars[[k]] - L_hats[[k]])
+        
+        # The spectral norm
+        eigDiff <- eigen(L_stars[[k]] - L_hats[[k]])
+        spec_norm[k] <- eigDiff$values[1]
+        
+        # Clustering
+        if(simtype == "simrand"){
+          # Figure out rank of matrix
+          r <- rankMatrix(L_hats[[k]])
+          
+          # Do kmeans clustering
+          z_hat <- kmeans(eigL_hat$vectors[,1:plat], max(z_stars[[k]]), iter.max = 100, nstart = 1000)$cluster
+          ARI[k] <- ari(z_stars[[k]], z_hat)
+        }
+      }
+    }
+    allsims <- rbind(allsims, cbind(model, simtype, iters, TP, TN, F1, sin_theta, frob_norm, spec_norm, ARI)) # Add to df
+  }
 }
 
 # Get summary values
-dfsummary <- allsims %>%
-  group_by(simtype) %>%
-  summarize(across(c(lvg_sin, sli_sin, lvg_fnorm, sli_fnorm), 
-                   list(mean = ~ mean(., na.rm = TRUE), 
-                        sd = ~ sd(., na.rm = TRUE)), 
-                   .names = "{.col}_{.fn}"))
+rm(list = setdiff(ls(), "allsims"))
+allsims <- allsims %>%
+  mutate(TP = as.numeric(TP),
+         TN = as.numeric(TN),
+         F1 = as.numeric(F1),
+         sin_theta = as.numeric(sin_theta),
+         frob_norm = as.numeric(frob_norm),
+         spec_norm = as.numeric(spec_norm),
+         ARI = as.numeric(ARI))
 
-# Example plots
-set.seed(123)
-pobs <- 150 # Number of observed variables for S
-n <- 10000 # Number of observations
-
-S_star <- Smat(pobs, 2, 1.5)
-Lout <- list(Lspir(pobs, 0.05), Lcirc(pobs, 0.05), Lcres(pobs, 0.1))
-Lnames <- c("spir", "circ", "cres")
-models = c("True", "slice", "lvglasso")
-for(i in 1:length(Lout)){
-  L_star <- Lout[[i]]$L
-  Sigma_star <- solve(S_star + L_star)
-  X <- mvrnorm(n, rep(0, pobs), Sigma_star)
-  Sigma <- cov(X)
-  
-  cvsli <- cv.slice(X)
-  cvlvg <- cv.lvg(X)
-  
-  sliout <- slice(Sigma, cvsli$lambda, cvsli$r)
-  lvgout <- lvglasso(Sigma, cvlvg$lambda, cvlvg$gamma) 
-  
-  Lall <- list(eigen(L_star)$vectors[,1:2], 
-               eigen(sliout$L)$vectors[,1:2],
-               eigen(lvgout$L)$vectors[,1:2])
-  for(j in 1:length(models)){
-    currplot <- ggplot(as.data.frame(Lall[[j]]), aes(x = V1, y = V2)) +
-      geom_point() + theme_bw() + geom_point(colour = "blue", alpha = 0.5) +
-      labs(title = models[j],
-           x = "",
-           y = "") +
-      theme(plot.title = element_text(hjust = 0.5))
-    
-    ggsave(paste0(Lnames[i], "_", models[j], ".png"), plot = currplot, width = 8, height = 6, dpi = 600)  
-  }
-}
+df_mean <- allsims %>%
+  group_by(model, simtype) %>%
+  summarize(across(c(TP, TN, F1, sin_theta, frob_norm, spec_norm, ARI), mean, na.rm = TRUE), .groups = 'drop')
+write.table(df_mean, "highn_mean.txt")
+df_sd <- allsims %>%
+  group_by(model, simtype) %>%
+  summarize(across(c(TP, TN, F1, sin_theta, frob_norm, spec_norm, ARI), sd, na.rm = TRUE), .groups = 'drop')
+write.table(df_mean, "highn_sd.txt")

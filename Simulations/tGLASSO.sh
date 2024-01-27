@@ -20,6 +20,7 @@ for model in "${models[@]}"; do
                 # Submit the job to SLURM with Rscript arguments
                 sbatch --job-name="${model}_plat${plat}_n${num}_batch${i}" --time=0-02:00 simbatch.sh $plat $num $start $end $model
                 sleep 1
+                sleep 1
             done
         done
     done

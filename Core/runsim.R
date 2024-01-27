@@ -3,9 +3,9 @@ library(MASS)
 runsim = function(simtype, method, pobs, plat = NULL, n, iters){
   S_hats <- L_hats <- S_stars <- L_stars <- z_stars <- vector("list", length(iters))
   # Loop through 100 iterations of simulation
-  for(i in iters){
-    print(paste0("SIM ITER ", i))
-    set.seed(123*i)
+  for(i in 1:length(iters)){
+    print(paste0("SIM ITER ", iters[i]))
+    set.seed(123*iters[i])
     
     S_star <- Smat(pobs, 2, 1.5)
     S_star[S_star < 0.01] <- 0 # True sparse component

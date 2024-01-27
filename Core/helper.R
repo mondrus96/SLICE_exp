@@ -33,7 +33,7 @@ isPD = function(mat){
 }
 
 # Get sin angle between two vectors
-sintheta <- function(v, v_hat){
+sintheta <- function(v_hat, v){
   return(sqrt(1 - sum(v_hat * v)^2))
 }
 

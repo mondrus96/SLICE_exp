@@ -12,13 +12,13 @@ for model in "${models[@]}"; do
         # Loop over n
         for num in "${n[@]}"; do
             # Loop over iterations
-            for i in {1..4}; do
+            for i in {1..10}; do
                 # Define start and end
-                start=$((1 + 25 * (i - 1)))
-                end=$((25 * i))
+                start=$((1 + 10 * (i - 1)))
+                end=$((10 * i))
 
                 # Submit the job to SLURM with Rscript arguments
-                sbatch --job-name="${model}_plat${plat}_n${num}_batch${i}" --time=0-06:00 simbatch.sh $plat $num $start $end $model
+                sbatch --job-name="${model}_plat${plat}_n${num}_batch${i}" --time=0-23:59 simbatch.sh $plat $num $start $end $model
                 sleep 1
             done
         done
