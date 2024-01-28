@@ -12,7 +12,7 @@ export R_LIBS=~/local/R_libs/
 echo "Received arguments: $1 $2 $3 $4"
 
 Rscript -e "
-sapply((paste0("../Core/", list.files("../Core/"))), source)
+sapply((paste0('../Core/', list.files('../Core/'))), source)
 
 pobs <- 150 # Number of observed variables for S
 n <- 10000 # Number of observations
@@ -21,5 +21,5 @@ plat <- as.integer(args[2])
 start <- as.integer(args[3])
 end <- as.integer(args[4])
 
-runsim(simtype, "rcLVGLASSO", pobs, plat, n, start:end) 
+runsim(simtype, 'rcLVGLASSO', pobs, plat, n, start:end) 
 " $1 $2 $3 $4

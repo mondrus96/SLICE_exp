@@ -32,10 +32,17 @@ plot_and_save <- function(data_list, file_name, xlab, ylab) {
   
   # Create the plot
   p <- ggplot(data_long, aes(x = Iteration, y = Value, group = Line, color = Line)) +
-    geom_line() +
-    labs(x = xlab, y = ylab) +
-    theme_minimal() +
-    theme(legend.title = element_blank()) 
+    geom_line(linewidth = 1.5) +
+    labs(x = xlab, y = ylab, color = "Rank of Latent") +
+    theme_bw() +
+    theme(
+      legend.position = c(0.85, 0.82),
+      legend.title = element_text(size = 25),
+      axis.text.x = element_text(size = 25),
+      axis.text.y = element_text(size = 25),
+      axis.title = element_text(size = 25),
+      legend.text = element_text(size = 25))
+  print(p)
   
   # Save the plot as a PNG file
   png(filename = file_name, width = 2000, height = 1400, res = 300)
@@ -46,4 +53,4 @@ plot_and_save <- function(data_list, file_name, xlab, ylab) {
 # Now, call the function for each of your lists
 plot_and_save(deltaS, "deltaS_plot.png", "Iterations", expression(Delta * S))
 plot_and_save(deltaL, "deltaL_plot.png", "Iterations", expression(Delta * L))
-plot_and_save(deltalogL, "deltalogL_plot.png", "Iterations", expression(Delta * log * L))
+plot_and_save(deltalogL, "deltalogL_plot.png", "Iterations", expression(Delta * log-Liklihood))

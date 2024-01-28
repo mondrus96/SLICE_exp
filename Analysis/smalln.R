@@ -93,18 +93,46 @@ plot_and_save_lines <- function(df, value){
     subdf <- subdf[subdf$model != "tGLASSO",]
   }
   
-  # Create the plot
+  # Generate ylabs
+  if(value == "F1"){
+    ylab <- "F1 Score"
+    legpos <-  c(0.111, 0.755)
+  } else if(value == "sin_theta"){
+    ylab <- expression("sin" * Theta(hat(u[1]), u[1]))
+    legpos <-  c(0.115, 0.23)
+  } else if(value == "spec_norm"){
+    ylab <- expression("||" * (hat(L) - L) * "||"[2])
+    legpos <-  c(0.285, 0.133)
+  } else if(value == "ARI"){
+    ylab <- value
+    legpos <-  c(0.11, 0.77)
+  }
+  
+  line_types <- c("SLICE" = "solid", "rcLVGLASSO" = "dashed", "nnLVGLASSO" = "dotted", "tGLASSO" = "dotdash")  # Adjust as per your actual model names
   p <- ggplot(subdf, aes(x = n, y = value, group = interaction(model, plat), color = as.factor(plat), linetype = model)) +
-    geom_line() +
-    geom_point(aes(shape = model)) +
-    labs(x = "n", y = value, color = "Rank of Latent", linetype = "Model", shape = "Model") +
+    geom_line(linewidth = 0.8) +
+    geom_point(aes(shape = model), size = 3.5) +
+    labs(x = "n", y = ylab, color = "Rank of Latent", linetype = "Model", shape = "Model") +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 90, hjust = 1), panel.border = element_blank())
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, size = 18),
+      axis.text.y = element_text(size = 18),
+      axis.title = element_text(size = 18),
+      legend.text = element_text(size = 18),
+      legend.title = element_text(size = 18),
+      legend.position = legpos) +
+      scale_linetype_manual(values = line_types) + guides(color = guide_legend(order = 1))
+    #+ guides(
+    #  color = guide_legend(nrow = 1, order = 1),
+    #  linetype = guide_legend(nrow = 1),
+    #  shape = guide_legend(nrow = 1)
+    #)
+  print(p)
   ggsave(paste0(value, ".png"), plot = p, width = 8, height = 6, dpi = 300)
 }
 
 # List of values to loop through
-vals <- c("F1", "sin_theta", "frob_norm", "spec_norm", "ARI")
+vals <- c("F1", "sin_theta", "spec_norm", "ARI")
 for(i in 1:length(vals)){
   plot_and_save_lines(df, vals[i])
 }
