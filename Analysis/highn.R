@@ -71,4 +71,4 @@ write.table(df_mean, "highn_mean.txt")
 df_sd <- allsims %>%
   group_by(model, simtype) %>%
   summarize(across(c(TP, TN, F1, sin_theta, frob_norm, spec_norm, ARI), sd, na.rm = TRUE), .groups = 'drop')
-write.table(df_mean, "highn_sd.txt")
+write.table(df_sd, "highn_sd.txt")

@@ -14,6 +14,8 @@ echo "Received arguments: $1 $2 $3 $4"
 Rscript -e "
 sapply((paste0('../Core/', list.files('../Core/'))), source)
 
+args <- commandArgs(trailingOnly = TRUE)
+
 pobs <- 150 # Number of observed variables for S
 n <- 10000 # Number of observations
 simtype <- as.character(args[1])

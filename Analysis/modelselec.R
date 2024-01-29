@@ -53,27 +53,31 @@ selec_count <- selec_df %>%
   mutate(proportion = count / total_count)
 likl_long <- merge(likl_long, selec_count, by = c("r", "lambda"), all.x = TRUE)
 
-
-
+# For formatting
 format_lambda <- function(x) {
   sprintf("%.4f", as.numeric(x))
 }
+
+# Plot
 p <- ggplot() +
   geom_tile(data = likl_long, aes(x = lambda, y = r, fill = likl), na.rm = TRUE) +
-  geom_text(data = subset(likl_long, !is.na(proportion)), aes(x = lambda, y = r, label = sprintf("%.2f", proportion)), color = "black", size = 8, na.rm = TRUE) +
+  geom_text(data = subset(likl_long, !is.na(proportion)), 
+            aes(x = lambda, y = r, label = sprintf("%.2f", proportion)), 
+            color = "black", size = 8, na.rm = TRUE) +
   scale_x_discrete(labels = format_lambda) +
   scale_fill_viridis() + 
-  labs(x = "Lambda", y = "r", fill = "Likelihood") +
+  labs(x = "Lambda", y = "Rank", fill = "Likelihood") +
   theme_minimal() +
   theme(
-    legend.position = "none",
     axis.text.x = element_text(size = 20, angle = 90, vjust = 0.5, hjust = 1),
-    legend.title = element_text(size = 20),
     axis.text.y = element_text(size = 20),
     axis.title = element_text(size = 20),
-    legend.text = element_text(size = 20))
+    legend.title = element_text(size = 20),
+    legend.text = element_text(size = 20)
+  ) +
+  guides(fill = guide_colourbar(barwidth = 1, barheight = 20))  # Adjust barwidth and barheight
 
 print(p)
 
 # Display the plot
-ggsave("modelselec.png", p)
+ggsave("modelselec.png", p, width = 12, height = 7, units = "in")
