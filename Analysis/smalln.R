@@ -3,6 +3,7 @@ library(ggplot2)
 library(tidyr)
 library(dplyr)
 library(Matrix)
+library(scales)
 sapply((paste0("../Core/", list.files("../Core/"))), source)
 
 # Get file names
@@ -82,8 +83,7 @@ write.table(sd_df, file = "lowNsd.txt")
 
 # Function to plot and save line grahps
 plot_and_save_lines <- function(df, value){
-  subdf <- df %>%
-    select(model, plat, n, contains(value))
+  subdf <- df[,colnames(df) %in% c("model", "plat", "n", value)]
   
   # Calculate the mean for each group
   colnames(subdf)[4] <- "value"
@@ -108,11 +108,13 @@ plot_and_save_lines <- function(df, value){
     legpos <-  c(0.11, 0.77)
   }
   
-  line_types <- c("SLICE" = "solid", "rcLVGLASSO" = "dashed", "nnLVGLASSO" = "dotted", "tGLASSO" = "dotdash")  # Adjust as per your actual model names
-  p <- ggplot(subdf, aes(x = n, y = value, group = interaction(model, plat), color = as.factor(plat), linetype = model)) +
+  line_types <- c("3" = "solid", "4" = "dashed", "5" = "dotted", "6" = "dotdash")  # Adjust as per your actual plat values
+  colpal <- hue_pal()(4)
+  model_cols <- c("SLICE" = colpal[2], "nnLVGLASSO" = colpal[3], "rcLVGLASSO" = colpal[1], "tGLASSO" = colpal[4])
+  p <- ggplot(subdf, aes(x = n, y = value, group = interaction(model, plat), color = model, linetype = as.factor(plat))) +
     geom_line(linewidth = 0.8) +
-    geom_point(aes(shape = model), size = 3.5) +
-    labs(x = "n", y = ylab, color = "Rank of Latent", linetype = "Model", shape = "Model") +
+    geom_point(aes(shape = as.factor(plat)), size = 3.5) +
+    labs(x = "n", y = ylab, color = "Model", linetype = "Rank of Latent", shape = "Rank of Latent") +
     theme_bw() +
     theme(
       axis.text.x = element_text(angle = 90, hjust = 1, size = 18),
@@ -121,11 +123,18 @@ plot_and_save_lines <- function(df, value){
       legend.text = element_text(size = 18),
       legend.title = element_text(size = 18),
       legend.position = legpos) +
-      scale_linetype_manual(values = line_types) + guides(color = guide_legend(order = 1))
-    #+ guides(
-    #  color = guide_legend(nrow = 1, order = 1),
-    #  linetype = guide_legend(nrow = 1),
-    #  shape = guide_legend(nrow = 1)
+    scale_linetype_manual(values = line_types) +
+    scale_color_manual(values = model_cols) +
+    scale_x_continuous(breaks = c(75, 150, 225, 300, 375)) +
+    guides(
+      color = guide_legend(order = 2),
+      linetype = guide_legend(order = 1),
+      shape = guide_legend(order = 1),
+    )
+    #guides(
+    #  color = guide_legend(nrow = 1, order = 2),
+    #  linetype = guide_legend(nrow = 1, order = 1),
+    #  shape = guide_legend(nrow = 1, order = 1),
     #)
   print(p)
   ggsave(paste0(value, ".png"), plot = p, width = 8, height = 6, dpi = 300)
