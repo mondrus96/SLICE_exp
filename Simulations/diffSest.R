@@ -1,4 +1,5 @@
 sapply((paste0("../Core/", list.files("../Core/"))), source)
+set.seed(321)
 
 pobs <- 100 # Number of observed variables for S
 plat <- 4 # Number of latent variables for L
