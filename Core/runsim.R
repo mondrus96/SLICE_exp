@@ -29,7 +29,7 @@ runsim <- function(simtype, method, pobs, plat = NULL, n, iters){
     
     Sigma_star <- solve(S_star + L_star) # True Sigma
     X <- mvrnorm(n, rep(0, pobs), Sigma = Sigma_star) # Finite sample data
-    Sigma <- cov(X) # Sample Sigma 
+    Sigma <- cov(X) # Sample Sigma
     
     # Model selection and parameter estimation
     if(method == "SLICE"){

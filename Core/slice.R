@@ -51,8 +51,7 @@ slice <- function(Sigma, lambda, rank, Sest = "glasso",
     E <- invSigma - L # Define new expectation
     E <- (E + t(E))/2
     
-    # Convergence check
-    deltaS <- c(deltaS, norm(S - Sold)); deltaL <- c(deltaL, norm(L - Lold))
+    deltaS <- c(deltaS, norm(S - Sold)); deltaL <- c(deltaL, norm(L - Lold)) # Convergence check
     deltalogL <- c(deltalogL, suppressWarnings(abs(logL(Sigma, S + L) - logL(Sigma, Sold + Lold))))
     if((deltaS[i] < tol) && (deltaL[i] < tol) || 
        ifelse(is.na(deltalogL[i] < tol), FALSE, deltalogL[i] < tol)){

@@ -16,7 +16,6 @@ gscad <- function(Sigma, lambda, a = 3.7){
   # Get SCAD estimate
   rhomat <- scadrightderv(abs(L1est), a, lambda)
   SCADest <- glasso(Sigma, rhomat)$wi
-  
   return(SCADest)
 }
 
