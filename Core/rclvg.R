@@ -9,7 +9,7 @@ rclvg <- function(Sigma, lambda, nLatents, tol = 1e-3, maxiter = 100){
   O <- c(rep(TRUE, pobs), rep(FALSE, nLatents)); H <- !O
   
   # Initialize
-  K <- matrix(0, ptot, ptot)
+  K <- matrix(rnorm(ptot*ptot), ptot, ptot)
   K[O,O] <- solve(makePD(Sigma)); K[O,H] <- K[H,H] <- K[H,O] <- 1
   
   iter <- 1

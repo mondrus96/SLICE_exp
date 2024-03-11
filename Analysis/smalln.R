@@ -85,6 +85,9 @@ write.table(sd_df, file = "lowNsd.txt")
 plot_and_save_lines <- function(df, value){
   subdf <- df[,colnames(df) %in% c("model", "plat", "n", value)]
   
+  # Change names to shortened version
+  subdf$model[subdf$model == "nnLVGLASSO"] = "nnLVG"; subdf$model[subdf$model == "rcLVGLASSO"] = "rcLVG"
+  
   # Calculate the mean for each group
   colnames(subdf)[4] <- "value"
   
@@ -96,21 +99,21 @@ plot_and_save_lines <- function(df, value){
   # Generate ylabs
   if(value == "F1"){
     ylab <- "F1 Score"
-    legpos <-  c(0.111, 0.755)
+    legpos <-  c(0.1, 0.745)
   } else if(value == "sin_theta"){
     ylab <- expression("sin" * Theta(hat(u[1]), u[1]))
-    legpos <-  c(0.115, 0.23)
+    legpos <-  c(0.1, 0.25)
   } else if(value == "spec_norm"){
     ylab <- expression("||" * (hat(L) - L) * "||"[2])
-    legpos <-  c(0.285, 0.133)
+    legpos <-  c(0.2, 0.15)
   } else if(value == "ARI"){
     ylab <- value
-    legpos <-  c(0.11, 0.77)
+    legpos <-  c(0.1, 0.76)
   }
   
   line_types <- c("3" = "solid", "4" = "dashed", "5" = "dotted", "6" = "dotdash")  # Adjust as per your actual plat values
   colpal <- hue_pal()(4)
-  model_cols <- c("SLICE" = colpal[2], "nnLVGLASSO" = colpal[3], "rcLVGLASSO" = colpal[1], "tGLASSO" = colpal[4])
+  model_cols <- c("SLICE" = colpal[2], "nnLVG" = colpal[3], "rcLVG" = colpal[1], "tGLASSO" = colpal[4])
   p <- ggplot(subdf, aes(x = n, y = value, group = interaction(model, plat), color = model, linetype = as.factor(plat))) +
     geom_line(linewidth = 0.8) +
     geom_point(aes(shape = as.factor(plat)), size = 3.5) +
@@ -119,23 +122,24 @@ plot_and_save_lines <- function(df, value){
     theme(
       axis.text.x = element_text(angle = 90, hjust = 1, size = 18),
       axis.text.y = element_text(size = 18),
-      axis.title = element_text(size = 18),
+      axis.title.x = element_text(size = 18, margin = margin(t = 15, r = 0, b = 0, l = 0)), # Adjusted for x-axis title
+      axis.title.y = element_text(size = 18, margin = margin(t = 0, r = 5, b = 0, l = 0)), # Adjusted for
       legend.text = element_text(size = 18),
       legend.title = element_text(size = 18),
       legend.position = legpos) +
     scale_linetype_manual(values = line_types) +
     scale_color_manual(values = model_cols) +
     scale_x_continuous(breaks = c(75, 150, 225, 300, 375)) +
-    guides(
-      color = guide_legend(order = 2),
-      linetype = guide_legend(order = 1),
-      shape = guide_legend(order = 1),
-    )
     #guides(
-    #  color = guide_legend(nrow = 1, order = 2),
-    #  linetype = guide_legend(nrow = 1, order = 1),
-    #  shape = guide_legend(nrow = 1, order = 1),
+    #  color = guide_legend(order = 2),
+    #  linetype = guide_legend(order = 1),
+    #  shape = guide_legend(order = 1),
     #)
+    guides(
+      color = guide_legend(nrow = 1, order = 2),
+      linetype = guide_legend(nrow = 1, order = 1),
+      shape = guide_legend(nrow = 1, order = 1),
+    )
   print(p)
   ggsave(paste0(value, ".png"), plot = p, width = 8, height = 6, dpi = 300)
 }

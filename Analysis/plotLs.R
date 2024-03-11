@@ -1,6 +1,7 @@
 library(ggplot2)
 library(dplyr)
 library(Matrix)
+library(gridExtra)
 
 # For plotting example Ls recovered by different methods
 sapply((paste0("../Core/", list.files("../Core/"))), source)
@@ -11,7 +12,7 @@ pobs <- 150 # Number of observed variables for S
 n <- 10000 # Number of observations
 
 Lnames <- c("cres", "spir")
-models <- c("True", "rcLVGLASSO", "nnLVGLASSO", "SLICE")
+models <- c("True", "rcLVG", "nnLVG", "SLICE")
 Lout <- list(Lcres(pobs, 0.1), Lspir(pobs, 0.02))
 S_star <- Smat(pobs, 2, 1.5); S_star[S_star < 0.01] <- 0
 for(i in 1:length(Lout)){
