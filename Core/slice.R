@@ -10,7 +10,7 @@ slice <- function(Sigma, lambda, rank, Sest = "glasso",
   # rank = rank
   # Sest = sparse estimator - glasso or clime
   
-  if(!Sest %in% c("glasso", "clime")){
+  if(!Sest %in% c("glasso", "clime", "gscad")){
     stop(paste(Sest, "is not a valid sparse model"))
   }
   
@@ -37,6 +37,8 @@ slice <- function(Sigma, lambda, rank, Sest = "glasso",
       S <- glasso(solve(E), lambda, thr = tol, maxit = maxiter)$wi  
     } else if(Sest == "clime"){
       S <- clime(solve(E), lambda, sigma = TRUE)$Omegalist[[1]]
+    } else if(Sest == "gscad"){
+      S <- gscad(solve(E), lambda)
     }
     S <- (S + t(S))/2
     

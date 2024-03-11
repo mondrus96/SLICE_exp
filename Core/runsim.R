@@ -1,6 +1,6 @@
 library(MASS)
 
-runsim = function(simtype, method, pobs, plat = NULL, n, iters){
+runsim <- function(simtype, method, pobs, plat = NULL, n, iters){
   S_hats <- L_hats <- S_stars <- L_stars <- z_stars <- vector("list", length(iters))
   # Loop through 100 iterations of simulation
   for(i in 1:length(iters)){
