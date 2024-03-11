@@ -16,6 +16,7 @@ models <- c("True", "rcLVG", "nnLVG", "SLICE")
 Lout <- list(Lcres(pobs, 0.1), Lspir(pobs, 0.02))
 S_star <- Smat(pobs, 2, 1.5); S_star[S_star < 0.01] <- 0
 for(i in 1:length(Lout)){
+  set.seed(123)
   L_star <- Lout[[i]]$L
   Sigma_star <- solve(S_star + L_star)
   X <- mvrnorm(n, rep(0, pobs), Sigma_star)
