@@ -19,6 +19,7 @@ sest <- c("glasso", "clime", "gscad") # Different sparse estimators
 mainlist <- list()
 mainlist$glasso <- mainlist$clime <- mainlist$gscad <- vector("list", 100)
 for(i in iters){
+  print(paste0("ITER: ", i))
   set.seed(i*123)
   X <- mvrnorm(n, rep(0, pobs), Sigma = Sigma_star) # Finite sample data
   Sigma <- cov(X) # Sample Sigma
@@ -26,7 +27,7 @@ for(i in iters){
   # Loop through different estimators
   for(j in sest){
     print(j)
-    cvout <- cv.slice(X, lambdas = logseq(1e-5, 0.05, 5), Sest = j)
+    cvout <- cv.slice(X, lambdas = logseq(1e-5, 0.05, 5), rs = plat, Sest = j)
     mainlist[[j]][[i]] <- slice(Sigma, cvout$lambda, cvout$r)
   }
   save(mainlist, file = "diffSest.rda")
