@@ -28,7 +28,7 @@ for(i in iters){
   for(j in sest){
     print(j)
     cvout <- cv.slice(X, lambdas = logseq(1e-5, 0.05, 5), rs = plat, Sest = j)
-    mainlist[[j]][[i]] <- slice(Sigma, cvout$lambda, cvout$r)
+    mainlist[[j]][[i]] <- slice(Sigma, cvout$lambda, cvout$r, Sest = j)
   }
   save(mainlist, file = "diffSest.rda")
 }
