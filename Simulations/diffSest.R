@@ -3,7 +3,7 @@ set.seed(321)
 
 pobs <- 100 # Number of observed variables for S
 plat <- 4 # Number of latent variables for L
-n <- 500 # Number of observations
+n <- 150 # Number of observations
 simtype <- "rand"
 iters <- 1:100
 

@@ -3,59 +3,41 @@ library(ggplot2)
 library(reshape2)
 sapply((paste0("../Core/", list.files("../Core/"))), source)
 
-### Plot and save TRUE
+### Generate Ss and Ls ###
+sapply((paste0("../Core/", list.files("../Core/"))), source)
+set.seed(123)
+
 pobs <- 100 # Number of observed variables for S
 plat <- 4 # Number of latent variables for L
-n <- 500 # Number of observations
+n <- 150 # Number of observations
 simtype <- "rand"
-iters <- 1:100
 
 S_star <- Smat(pobs, 2, 1.5)
 S_star[S_star < 0.01] <- 0 # True sparse component
-S_star <- 1*(S_star != 0)
 
 Lout <- Lrand(pobs, plat, 1.5)
 L_star <- Lout$L; z_star <- Lout$z # True latent component; True cluster labels
 
-# Plot the heatmap in black and white
-png("S_star.png", width = 600, height = 600)
-heatmap(x = S_star,
-        Rowv = NA,  # Disable row clustering
-        Colv = NA,  # Disable column clustering
-        symm = TRUE, # Indicates the matrix is symmetric
-        scale = "none", # Don't scale the data
-        labRow = "", # Remove x-axis label
-        labCol = "", # Remove y-axis label
-        col = colorRampPalette(c("white", "black"))(256)) # Black & White color scheme
-dev.off()
-png("L_star.png", width = 600, height = 600)
-heatmap(x = L_star,
-        Rowv = NA,  # Disable row clustering
-        Colv = NA,  # Disable column clustering
-        symm = TRUE, # Indicates the matrix is symmetric
-        scale = "none", # Don't scale the data
-        labRow = "", # Remove x-axis label
-        labCol = "", # Remove y-axis label
-        col = colorRampPalette(c("white", "black"))(256)) # Black & White color scheme
-dev.off()
+Sigma_star <- solve(S_star + L_star) # True Sigma
 
-### Plot and save estimated
-# Load data
-load("../Simulations/diffSest.rda")
-mainlist$glasso[[1]]$S
-for(model in names(mainlist)){
-  # Calculate average S and L
-  avgS <- avgL <- matrix(0, 100, 100)
-  for(i in 1:length(mainlist[[model]])){
-    S <- mainlist[[model]][[i]]$S
-    avgS <- avgS + 1*(S != 0)
-    avgL <- avgL + mainlist[[model]][[i]]$L
-  }
-  avgS <- avgS/100; avgL <- avgL/100
-  
-  # Plot the heatmap in black and white
-  png(paste0("S", model, ".png"), width = 600, height = 600)
-  heatmap(x = avgS,
+X <- mvrnorm(n, rep(0, pobs), Sigma_star) # Run multivariate normal
+Sigma = cov(X)
+
+### Estimate w/ diff Sests ###
+outs <- vector("list", 4)
+outs[[1]] <- list(S = S_star, L = L_star)
+models <- c("glasso", "clime", "gscad")
+for(i in seq_along(models)){
+  out <- slice(Sigma, 0.12, plat, models[i])
+  out$S[abs(out$S) < 1e-5] <- 0
+  outs[[i + 1]] <- list(S = out$S, L = out$L)
+}
+names(outs) <- c("true", models)
+
+### Generate plots ###
+for(i in seq_along(outs)){
+  png(paste0(names(outs)[i], "_S.png"), width = 600, height = 600)
+  heatmap(x = 1*(outs[[i]]$S != 0),
           Rowv = NA,  # Disable row clustering
           Colv = NA,  # Disable column clustering
           symm = TRUE, # Indicates the matrix is symmetric
@@ -64,8 +46,8 @@ for(model in names(mainlist)){
           labCol = "", # Remove y-axis label
           col = colorRampPalette(c("white", "black"))(256)) # Black & White color scheme
   dev.off()
-  png(paste0("L", model, ".png"), width = 600, height = 600)
-  heatmap(x = avgL,
+  png(paste0(names(outs)[i], "_L.png"), width = 600, height = 600)
+  heatmap(x = outs[[i]]$L,
           Rowv = NA,  # Disable row clustering
           Colv = NA,  # Disable column clustering
           symm = TRUE, # Indicates the matrix is symmetric
