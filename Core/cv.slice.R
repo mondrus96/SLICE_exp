@@ -1,11 +1,12 @@
 library(pracma)
 
-cv.slice = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), rs = c(2:6), Sest = "glasso"){
+cv.slice = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), rs = c(2:6), Sest = "glasso", maxiter = 100){
   # X = input data matrix, or Sigma
   # k = number of folds to perform for CV
   # lambdas = list of lambdas values to try
   # rs = list of rs to try
   # sest = sparse estimator - either glasso, clime, or gscad
+  # maxiter = maximum iterations
   
   n <- nrow(X) # number of samples
   cvmat <- matrix(NA, length(rs), length(lambdas)); rownames(cvmat) <- rs; colnames(cvmat) <- lambdas
@@ -21,7 +22,7 @@ cv.slice = function(X, folds = 3, lambdas = logseq(1e-5, 0.1, 5), rs = c(2:6), S
       for(k in 1:folds){
         train <- X[ind != k,]; test <- X[ind == k,] # Train and test sets
         
-        out <- slice(cov(train), lambdas[j], rs[i], Sest) # Run method
+        out <- slice(cov(train), lambdas[j], rs[i], Sest, maxiter = maxiter) # Run method
         S <- out$S; L <- out$L
         
         likl <- logL(cov(test), S + L) # Append to mulogL

@@ -35,7 +35,7 @@ for(i in 1:length(Lout)){
   plotlist <- vector("list", 4)
   for(j in 1:length(models)){
     currplot <- ggplot(as.data.frame(Lall[[j]]), aes(x = V1, y = V2)) +
-      geom_point() + theme_minimal() + geom_point(colour = "blue", alpha = 0.5) +
+      geom_point() + theme_minimal() + geom_point(colour = "black", alpha = 0.5) +
       labs(title = models[j], x = NULL, y = NULL) +  # Set x and y labels to NULL
       theme(
         plot.title = element_text(hjust = 0.5, size = 20),
@@ -52,5 +52,5 @@ for(i in 1:length(Lout)){
   }
   # Arrange the plots in a grid
   gridplot <- grid.arrange(grobs = plotlist, ncol = 4)
-  ggsave(paste0(Lnames[i], ".png"), plot = gridplot, width = 8, height = 3, dpi = 600)  
+  ggsave(paste0(Lnames[i], ".png"), plot = gridplot, width = 8, height = 3, dpi = 600)
 }

@@ -32,6 +32,13 @@ isPD = function(mat){
   })
 }
 
+makeSymmetric <- function(mat){
+  rowscols <- which(upper.tri(mat), arr.ind=TRUE)
+  return(sparseMatrix(i=rowscols[,1], j=rowscols[,2], 
+                      x=mat[upper.tri(mat)], symmetric=TRUE, 
+                      dims=c(nrow(mat),ncol(mat))))
+}
+
 # Get sin angle between two vectors
 sintheta <- function(v_hat, v){
   return(sqrt(1 - sum(v_hat * v)^2))

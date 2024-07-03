@@ -1,6 +1,6 @@
 library(glasso)
 
-ebic.tg = function(X, lambdas = NULL, taus = logseq(1e-5, 0.15, 20)){
+ebic.tg = function(X, lambdas = NULL, taus = logseq(1e-5, 0.2, 20)){
   # X = input data matrix
   # lambda = vector of lambdas to try
   # tau = vector of thresholds to try

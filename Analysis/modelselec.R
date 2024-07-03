@@ -1,5 +1,4 @@
 library(ggplot2)
-library(viridis)
 library(tidyr)
 library(dplyr)
 sapply((paste0("../Core/", list.files("../Core/"))), source)
@@ -37,6 +36,7 @@ for(i in 1:iters){
 likls <- likls/iters
 # Save
 save(rs, lambdas, likls, file = "modelselec.rda")
+load("modelselec.rda")
 
 # Convert it to long format
 likl_long <- as.data.frame(likls) %>%
@@ -63,20 +63,17 @@ p <- ggplot() +
   geom_tile(data = likl_long, aes(x = lambda, y = r, fill = likl), na.rm = TRUE) +
   geom_text(data = subset(likl_long, !is.na(proportion)), 
             aes(x = lambda, y = r, label = sprintf("%.2f", proportion)), 
-            color = "black", size = 8, na.rm = TRUE) +
+            color = "blue", size = 8, na.rm = TRUE) +
   scale_x_discrete(labels = format_lambda) +
-  scale_fill_viridis() + 
-  labs(x = "Lambda", y = "Rank", fill = "Likelihood") +
+  scale_fill_gradient(low = "#636363", high = "white") +  # Set color gradient from black to white
+  labs(x = "Lambda", y = "Rank") +
   theme_minimal() +
   theme(
     axis.text.x = element_text(size = 20, angle = 90, vjust = 0.5, hjust = 1),
     axis.text.y = element_text(size = 20),
     axis.title = element_text(size = 20),
-    legend.title = element_text(size = 20),
-    legend.text = element_text(size = 20)
-  ) +
-  guides(fill = guide_colourbar(barwidth = 1, barheight = 20))  # Adjust barwidth and barheight
-
+    legend.position = "none"  # Remove the legend
+  )
 print(p)
 
 # Display the plot

@@ -10,15 +10,10 @@ runsim <- function(simtype, method, pobs, plat = NULL, n, iters){
     S_star <- Smat(pobs, 2, 1.5)
     S_star[S_star < 0.01] <- 0 # True sparse component
     
-    if (simtype == "exp"){
-      Lout <- Lexp(pobs, plat, 1.5)
-    } else if (simtype == "rand"){
+    if (simtype == "rand"){
       Lout <- Lrand(pobs, plat, 1.5)
     } else if (simtype == "cres"){
       Lout <- Lcres(pobs, 0.1)
-      plat <- 2
-    } else if (simtype == "circ"){
-      Lout <- Lcirc(pobs, 0.05)
       plat <- 2
     } else if (simtype == "spir"){
       Lout <- Lspir(pobs, 0.05)

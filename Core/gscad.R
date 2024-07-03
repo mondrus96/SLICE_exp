@@ -11,11 +11,8 @@ gscad <- function(Sigma, lambda, a = 3.7){
   
   # Generate rhomat
   p <- nrow(Sigma)
-  rhomat <- lambda*matrix(1,p,p)/(pmax(abs(L1est)^0.5,1e-5))
-  
-  # Get SCAD estimate
-  rhomat <- scadrightderv(abs(L1est), a, lambda)
-  SCADest <- glasso(Sigma, rhomat)$wi
+  lambdamat <- scadrightderv(abs(L1est), a, lambda)
+  SCADest <- glasso(Sigma, lambdamat)$wi
   return(SCADest)
 }
 

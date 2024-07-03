@@ -51,7 +51,7 @@ for(model in models){
           }
           i <- i + 1
         }
-        # Get the 
+        # Save results
         allsims <- rbind(allsims, cbind(model, plat, n, iters, F1, sin_theta, frob_norm, spec_norm, ARI)) # Add to df
         save(allsims, file = "lowNdf.rda")
       }
@@ -70,6 +70,7 @@ allsims <- allsims %>%
          spec_norm = as.numeric(spec_norm),
          ARI = as.numeric(ARI))
 save(allsims, file = "lowNdf.rda")
+load("lowNdf.rda")
 
 # Summarize
 df <- allsims %>%
@@ -81,7 +82,7 @@ sd_df <- allsims %>%
   summarise(across(c(F1, sin_theta, frob_norm, spec_norm, ARI), sd, na.rm = TRUE))
 write.table(sd_df, file = "lowNsd.txt")
 
-# Function to plot and save line grahps
+# Function to plot and save line graphs
 plot_and_save_lines <- function(df, value){
   subdf <- df[,colnames(df) %in% c("model", "plat", "n", value)]
   
@@ -99,21 +100,20 @@ plot_and_save_lines <- function(df, value){
   # Generate ylabs
   if(value == "F1"){
     ylab <- "F1 Score"
-    legpos <-  c(0.1, 0.745)
+    legpos <-  c(0.27, 0.865)
   } else if(value == "sin_theta"){
     ylab <- expression("sin" * Theta(hat(u[1]), u[1]))
-    legpos <-  c(0.1, 0.25)
+    legpos <-  c(0.2, 0.15)
   } else if(value == "spec_norm"){
-    ylab <- expression("||" * (hat(L) - L) * "||"[2])
+    ylab <- expression("||" * (hat(L) - L^"*") * "||"[2])
     legpos <-  c(0.2, 0.15)
   } else if(value == "ARI"){
     ylab <- value
-    legpos <-  c(0.1, 0.76)
+    legpos <-  c(0.2, 0.866)
   }
   
   line_types <- c("3" = "solid", "4" = "dashed", "5" = "dotted", "6" = "dotdash")  # Adjust as per your actual plat values
-  colpal <- hue_pal()(4)
-  model_cols <- c("SLICE" = colpal[2], "nnLVG" = colpal[3], "rcLVG" = colpal[1], "tGLASSO" = colpal[4])
+  model_cols <- c("SLICE" = "#0C6291", "nnLVG" = "#A63446", "rcLVG" = "#34A646", "tGLASSO" = "#A634A6")
   p <- ggplot(subdf, aes(x = n, y = value, group = interaction(model, plat), color = model, linetype = as.factor(plat))) +
     geom_line(linewidth = 0.8) +
     geom_point(aes(shape = as.factor(plat)), size = 3.5) +
@@ -130,18 +130,13 @@ plot_and_save_lines <- function(df, value){
     scale_linetype_manual(values = line_types) +
     scale_color_manual(values = model_cols) +
     scale_x_continuous(breaks = c(75, 150, 225, 300, 375)) +
-    #guides(
-    #  color = guide_legend(order = 2),
-    #  linetype = guide_legend(order = 1),
-    #  shape = guide_legend(order = 1),
-    #)
     guides(
       color = guide_legend(nrow = 1, order = 2),
       linetype = guide_legend(nrow = 1, order = 1),
       shape = guide_legend(nrow = 1, order = 1),
     )
   print(p)
-  ggsave(paste0(value, ".png"), plot = p, width = 8, height = 6, dpi = 300)
+  ggsave(paste0(value, ".png"), plot = p, width = 10, height = 7, dpi = 300)
 }
 
 # List of values to loop through

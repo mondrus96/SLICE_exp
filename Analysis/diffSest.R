@@ -20,8 +20,9 @@ L_star <- Lout$L; z_star <- Lout$z # True latent component; True cluster labels
 
 Sigma_star <- solve(S_star + L_star) # True Sigma
 
-X <- mvrnorm(n, rep(0, pobs), Sigma_star) # Run multivariate normal
-Sigma = cov(X)
+# Generate sample covariance
+X <- mvrnorm(10000, rep(0, pobs), Sigma_star)
+Sigma <- cov(X)
 
 ### Estimate w/ diff Sests ###
 outs <- vector("list", 4)

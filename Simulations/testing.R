@@ -1,41 +1,32 @@
 sapply((paste0("../Core/", list.files("../Core/"))), source)
 
-pobs <- 100 # Number of observed variables for S
-plat <- 4 # Number of latent variables for L
-n <- 100000 # Number of observations
+pobs <- 5000 # Number of observed variables for S
+#n <- 10000 # Number of observations
+simtype <- "cres"
 
-set.seed(12345)
+S_star <- Smat(pobs, 2, 1.5)
+S_star[S_star < 0.01] <- 0 # True sparse component
 
-S_star <- Smat(pobs, 2, 1)
-S_star[S_star < 0.01] <- 0
-
-Lout <- Lrand(pobs, plat, 1.5)
-L_star <- Lout$L; z_star <- Lout$z
-
-Sigma_star <- solve(S_star + L_star)
-X <- mvrnorm(n, rep(0, pobs), Sigma_star)
-
-cvsli <- cv.slice(X)
-cvlvg <- cv.lvg(X)
-
-sliout <- slice(cov(X), cvsli$lambda, cvsli$r)
-lvgout <- lvglasso(cov(X), cvlvg$lambda, cvlvg$gamma)
-
-# Function for calculating F1 score
-F1score <- function(true, pred) {
-  TP <- sum(true == 1 & pred == 1)
-  FP <- sum(true == 0 & pred == 1)
-  FN <- sum(true == 1 & pred == 0)
-  
-  precision <- TP / (TP + FP)
-  recall <- TP / (TP + FN)
-  
-  return(2 * precision * recall / (precision + recall))
+if (simtype == "exp"){
+  Lout <- Lexp(pobs, plat, 1.5)
+} else if (simtype == "rand"){
+  Lout <- Lrand(pobs, plat, 1.5)
+} else if (simtype == "cres"){
+  Lout <- Lcres(pobs, 0.1)
+  plat <- 2
+} else if (simtype == "circ"){
+  Lout <- Lcirc(pobs, 0.05)
+  plat <- 2
+} else if (simtype == "spir"){
+  Lout <- Lspir(pobs, 0.05)
+  plat <- 2
 }
 
-true <- 1*(S_star[upper.tri(S_star)] != 0)
-sli <- 1*(sliout$S[upper.tri(sliout$S)] != 0)
-lvg <- 1*(lvgout$S[upper.tri(lvgout$S)] != 0)
+L_star <- Lout$L; z_star <- Lout$z # True latent component; True cluster labels
+Sigma_star <- Matrix::chol2inv(Matrix::chol(S_star + L_star)) # True Sigma
 
-F1score(true, sli)
-F1score(true, lvg)
+start <- Sys.time()
+sli <- slice(Sigma_star, 0.05, 2, Sest = "huge_glasso")
+end <- Sys.time()
+end - start
+sum(sli$S[upper.tri(sli$S)] != 0)

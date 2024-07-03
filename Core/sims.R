@@ -20,37 +20,6 @@ Smat <- function(p, decay, init_val){
   return(S)
 }
 
-# Uniform community structure
-Lunif <- function(p, r, init_val, sd = 0){
-  Z <- matrix(0, p, r) # Define Z
-  for(i in 1:p){
-    Z[i,sample(1:r, 1)] <- 1
-  }
-  z <- apply(Z, 1, function(row) which(row == 1)) # true clusters
-  
-  L <- Z %*% t(Z) 
-  L <- L * init_val
-
-  return(list(L = L, z = z))
-}
-
-# Exponential community structure
-Lexp <- function(p, r, init_val){
-  probs <- exp(-1*(0:(r - 1))) # Get probabilities
-  probs <- probs/sum(probs)
-  
-  Z <- matrix(0, p, r)
-  for(i in 1:p){
-    Z[i,sample(1:r, 1, prob = probs)] <- 1
-  }
-  z <- apply(Z, 1, function(row) which(row == 1))
-  
-  L <- Z %*% t(Z)
-  L <- L * init_val
-  
-  return(list(L = L, z = z))
-}
-
 # Random community sizes
 Lrand <- function(p, r, init_val){
   probs <- runif(r) # Get probabilities
