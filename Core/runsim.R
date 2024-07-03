@@ -31,6 +31,14 @@ runsim <- function(simtype, method, pobs, plat = NULL, n, iters){
       cvsli <- cv.slice(X)
       sli <- slice(Sigma, cvsli$lambda, cvsli$r)
       S <- sli$S; L <- sli$L
+    } else if(method == "SLICE_GSCAD"){
+      cvsli <- cv.slice(X, Sest = "gscad")
+      sli <- slice(Sigma, cvsli$lambda, cvsli$r, Sest = "gscad")
+      S <- sli$S; L <- sli$L
+    } else if(method == "SLICE_CLIME"){
+      cvsli <- cv.slice(X, Sest = "clime")
+      sli <- slice(Sigma, cvsli$lambda, cvsli$r, Sest = "clime")
+      S <- sli$S; L <- sli$L
     } else if(method == "nnLVGLASSO"){
       cvnnlvg <- cv.nnlvg(X)
       nnlvg <- nnlvg(Sigma, cvnnlvg$lambda, cvnnlvg$gamma)
