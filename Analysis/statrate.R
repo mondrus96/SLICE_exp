@@ -2,6 +2,7 @@ library(MASS)
 library(ggplot2)
 sapply((paste0("../Core/", list.files("../Core/"))), source)
 
+### CONSISTENCY (n -> infty) ###
 # Define simulation parameters
 set.seed(321)
 p <- 100
@@ -77,3 +78,34 @@ ggplot(data_l, aes(x = n, y = Rate, color = Type, group = Type, shape = Type)) +
         plot.title = element_text(hjust = 0.5, size = 20),
         legend.position = "none")
 dev.off()
+
+### CONSISTENCY (p -> infty) ###
+# Loop through different values of p
+Ssign <- c()
+lambda <- 0.2
+ps <- seq(40, 1000, 5)
+for(i in seq_along(ps)){
+  print(i)
+  p <- ps[i]
+  
+  set.seed(321)
+  L_star <- Lspir(p)$L
+  S_star <- Smat(p, 1, 0.8)
+  sort(unique(as.vector(S_star)), TRUE)
+  S_star[S_star < 0.2] <- 0 # True sparse component
+  S_star[S_star != 0] <- 0.9
+  s <- S_star
+  diag(s) <- 0
+  s <- sum(s != 0) # Number of non-zero edges
+  Sigma_star <- solve(S_star + L_star)
+  
+  sliout <- slice(Sigma_star, lambda*sqrt(log(p)), 2, 
+                  tol = 1e-3, maxiter = 1000, Sest = "huge_glasso") # Estimates
+  S_hat <- sliout$S
+  
+  upp_S_star <- S_star[upper.tri(S_star)]
+  upp_S_hat <- S_hat[upper.tri(S_hat)]
+  Ssign <- c(Ssign, mean(upp_S_star == upp_S_hat))
+  save(Ssign, file = "Ssign.rda")
+}
+plot(Ssign)
