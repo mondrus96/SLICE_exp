@@ -18,6 +18,8 @@ runsim <- function(simtype, method, pobs, plat = NULL, n, iters){
     } else if (simtype == "spir"){
       Lout <- Lspir(pobs, 0.05)
       plat <- 2
+    } else if (simtype == "eeg"){
+      load("eeg_sim_params.rda")
     }
     
     L_star <- Lout$L; z_star <- Lout$z # True latent component; True cluster labels

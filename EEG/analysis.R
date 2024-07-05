@@ -9,21 +9,21 @@ names(Xs) = conds
 for(i in 1:16){
   # Loop over conditions
   for(j in conds){
-    X = read.csv(paste0("./sub-", sprintf("%02d", i),"/meeg/", j, ".txt"))
+    X = read.csv(paste0("./sub-", sprintf("%02d", i),"/meeg/", j, "_hyp.txt"))
     colnames(X) = 1:ncol(X)
     Xs[[j]] = rbind(Xs[[j]], X)
   }
 }
 
-sli1 = slice(cor(Xs$Famous), 0.01, 2)
+sli1 = slice(cor(Xs$Famous), 0.1, 5)
 heatmap(sli1$L, Rowv = NA, Colv = NA)
 heatmap(1*(sli1$S != 0), Rowv = NA, Colv = NA)
 
-sli2 = slice(cor(Xs$Unfamiliar), 0.01, 2)
+sli2 = slice(cor(Xs$Unfamiliar), 0.1, 5)
 heatmap(sli2$L, Rowv = NA, Colv = NA)
 heatmap(1*(sli2$S != 0), Rowv = NA, Colv = NA)
 
-sli3 = slice(cor(Xs$Scrambled), 0.01, 2)
+sli3 = slice(cor(Xs$Scrambled), 0.1, 5)
 heatmap(sli3$L, Rowv = NA, Colv = NA)
 heatmap(1*(sli3$S != 0), Rowv = NA, Colv = NA)
 
@@ -43,21 +43,27 @@ plot(eigL1$vectors[,1], eigL1$vectors[,2])
 plot(eigL2$vectors[,1], eigL2$vectors[,2])
 plot(eigL3$vectors[,1], eigL3$vectors[,2])
 
+# Create a data frame for each group
+df1 <- data.frame(x = eigL1$vectors[,1], y = eigL1$vectors[,2], group = "eigL1")
+df2 <- data.frame(x = eigL2$vectors[,1], y = eigL2$vectors[,2], group = "eigL2")
+df3 <- data.frame(x = eigL3$vectors[,1], y = eigL3$vectors[,2], group = "eigL3")
+
+# Combine the data frames into one
+combined_df <- rbind(df1, df2, df3)
+#combined_df <- rbind(df1, df3)
+
+# Plot the data using ggplot2
+ggplot(combined_df, aes(x = x, y = y, color = group)) +
+  geom_point() +
+  labs(title = "Scatter Plot of Eigenvectors", x = "First Eigenvector", y = "Second Eigenvector") +
+  theme_minimal()
+
+
 cor.test(eigL1$vectors[,1], eigL2$vectors[,1])
-cor.test(eigL1$vectors[,2], eigL2$vectors[,2])
 
 cor.test(eigL1$vectors[,1], eigL3$vectors[,1])
-cor.test(eigL1$vectors[,2], eigL3$vectors[,2])
 
 cor.test(eigL3$vectors[,1], eigL2$vectors[,1])
-cor.test(eigL3$vectors[,2], eigL2$vectors[,2])
-
-# Calculate node-wise statistics and comapre across groups
-# hyper-align across subjects
-
-# Load necessary libraries
-library(Rtsne)
-library(ggplot2)
 
 # Example data
 set.seed(123)
