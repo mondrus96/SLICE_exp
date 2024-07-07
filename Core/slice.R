@@ -5,10 +5,10 @@ library(huge)
 library(Matrix)
 
 # Main slice estimator
-slice <- function(Sigma, lambda, rank, Sest = "glasso",
+slice <- function(Sigma, rho, rank, Sest = "glasso",
                   tol = 1e-3, maxiter = 100){
   # Sigma = the input covariance matrix
-  # lambda = regularization parameter for clime/graphical lasso
+  # rho = regularization parameter for clime/graphical lasso
   # rank = rank
   # Sest = sparse estimator
   
@@ -33,13 +33,13 @@ slice <- function(Sigma, lambda, rank, Sest = "glasso",
     # Sparse step
     Sold <- S
     if(Sest == "glasso"){
-      S <- glasso(Matrix::chol2inv(Matrix::chol(E)), lambda, thr = tol, maxit = maxiter)$wi
+      S <- glasso(Matrix::chol2inv(Matrix::chol(E)), rho, thr = tol, maxit = maxiter)$wi
     } else if(Sest == "clime"){
-      S <- clime(Matrix::chol2inv(Matrix::chol(E)), lambda, sigma = TRUE)$Omegalist[[1]]
+      S <- clime(Matrix::chol2inv(Matrix::chol(E)), rho, sigma = TRUE)$Omegalist[[1]]
     } else if(Sest == "gscad"){
-      S <- gscad(Matrix::chol2inv(Matrix::chol(E)), lambda)
+      S <- gscad(Matrix::chol2inv(Matrix::chol(E)), rho)
     } else if(Sest == "huge_glasso"){
-      S <- huge(Matrix::chol2inv(Matrix::chol(E)), lambda, method = "glasso", verbose = FALSE)$icov[[1]]
+      S <- huge(Matrix::chol2inv(Matrix::chol(E)), rho, method = "glasso", verbose = FALSE)$icov[[1]]
     }
     
     # Latent step
@@ -63,7 +63,7 @@ slice <- function(Sigma, lambda, rank, Sest = "glasso",
       break
     }
   }
-  return(list(S = S, L = L, lambda = lambda, rank = rank, 
+  return(list(S = S, L = L, rho = rho, rank = rank, 
               misc = list(converged = ifelse(i != maxiter, TRUE, FALSE), iters = i,
               deltaS = deltaS, deltaL = deltaL, deltalogL = deltalogL)))
 }

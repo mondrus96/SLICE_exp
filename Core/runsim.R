@@ -31,23 +31,23 @@ runsim <- function(simtype, method, pobs, plat = NULL, n, iters){
     # Model selection and parameter estimation
     if(method == "SLICE"){
       cvsli <- cv.slice(X)
-      sli <- slice(Sigma, cvsli$lambda, cvsli$r)
+      sli <- slice(Sigma, cvsli$rho, cvsli$r)
       S <- sli$S; L <- sli$L
     } else if(method == "SLICE_GSCAD"){
       cvsli <- cv.slice(X, Sest = "gscad")
-      sli <- slice(Sigma, cvsli$lambda, cvsli$r, Sest = "gscad")
+      sli <- slice(Sigma, cvsli$rho, cvsli$r, Sest = "gscad")
       S <- sli$S; L <- sli$L
     } else if(method == "SLICE_CLIME"){
       cvsli <- cv.slice(X, Sest = "clime")
-      sli <- slice(Sigma, cvsli$lambda, cvsli$r, Sest = "clime")
+      sli <- slice(Sigma, cvsli$rho, cvsli$r, Sest = "clime")
       S <- sli$S; L <- sli$L
     } else if(method == "nnLVGLASSO"){
       cvnnlvg <- cv.nnlvg(X)
-      nnlvg <- nnlvg(Sigma, cvnnlvg$lambda, cvnnlvg$gamma)
+      nnlvg <- nnlvg(Sigma, cvnnlvg$rho, cvnnlvg$gamma)
       S <- nnlvg$S; L <- nnlvg$L
     } else if(method == "rcLVGLASSO"){
       cvrclvg <- cv.rclvg(X)
-      rclvg <- rclvg(Sigma, cvrclvg$lambda, cvrclvg$r)
+      rclvg <- rclvg(Sigma, cvrclvg$rho, cvrclvg$r)
       S <- rclvg$S; L <- rclvg$L
     } else if(method == "tGLASSO"){
       S <- ebic.tg(X)$S
