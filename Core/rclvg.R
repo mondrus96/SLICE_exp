@@ -2,7 +2,7 @@ library(corpcor)
 library(glasso)
 
 ### Main rank constrained lvglasso function
-rclvg <- function(Sigma, lambda, nLatents, tol = 1e-3, maxiter = 100){
+rclvg <- function(Sigma, rho, nLatents, tol = 1e-3, maxiter = 100){
   # To make life easier
   pobs <- ncol(Sigma)
   ptot <- pobs + nLatents
@@ -21,7 +21,7 @@ rclvg <- function(Sigma, lambda, nLatents, tol = 1e-3, maxiter = 100){
       K <- makePD(K)
     }
     expS <- as.matrix(forceSymmetric(Estep(Sigma, K, O, H))) # E step
-    K <- as.matrix(forceSymmetric(Mstep(expS, O, lambda))) # M step
+    K <- as.matrix(forceSymmetric(Mstep(expS, O, rho))) # M step
     
     S <- K[O,O]; L <- K[O,H] %*% K[H,H] %*% K[H,O] # Define S and L
     
@@ -58,13 +58,13 @@ Estep <- function(Sigma, Kcur, O, H){
 }
 
 # M-step in the optimization algorithm:
-Mstep <- function(expS, O, lambda){
+Mstep <- function(expS, O, rho){
   if (!isPD(expS)){
     expS <- as.matrix(makePD(expS))
   }
   # Rho matrix
   n <- nrow(expS)
-  RhoMat <- matrix(lambda, n, n)
+  RhoMat <- matrix(rho, n, n)
   RhoMat[!O,] <- 0
   RhoMat[,!O] <- 0
   
