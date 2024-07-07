@@ -7,6 +7,11 @@ runsim <- function(simtype, method, pobs, plat = NULL, n, iters){
     print(paste0("SIM ITER ", iters[i]))
     set.seed(123*iters[i])
     
+    dir_path <- paste0("./", method) # Make directory if it doesn't exist
+    if (!dir.exists(dir_path)) {
+      dir.create(dir_path, recursive = TRUE)
+    }
+    
     S_star <- Smat(pobs, 2, 1.5)
     S_star[S_star < 0.01] <- 0 # True sparse component
     
