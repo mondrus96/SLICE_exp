@@ -1,4 +1,4 @@
-library(flare)
+library(clime)
 library(glasso)
 library(RSpectra)
 library(huge)
@@ -33,10 +33,12 @@ slice <- function(Sigma, rho, rank, Sest = "glasso",
     # Sparse step
     Sold <- S
     if(Sest == "glasso"){
-      S <- glasso(Matrix::chol2inv(Matrix::chol(E)), rho, thr = tol, maxit = maxiter)$wi
+      S <- glasso(Matrix::chol2inv(Matrix::chol(E)), rho, 
+                  thr = tol, maxit = maxiter)$wi
     } else if(Sest == "clime"){
-      S <- sugm(Matrix::chol2inv(Matrix::chol(E)), rho, 
-                method = "clime", verbose = FALSE)$icov[[1]]
+      S <- clime(Matrix::chol2inv(Matrix::chol(E)), rho, 
+                sigma = TRUE, linsolver = "simplex")$Omegalist[[1]]
+      S[abs(S) < tol] <- 0
     } else if(Sest == "gscad"){
       S <- gscad(Matrix::chol2inv(Matrix::chol(E)), rho)
     } else if(Sest == "huge_glasso"){
