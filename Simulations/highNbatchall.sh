@@ -1,20 +1,13 @@
 #!/bin/bash
+models=("SLICE" "SLICE_GSCAD" "SLICE_CLIME" "nnLVGLASSO" "rcLVGLASSO")
+simtypes=("cres" "spir" "rand" "eeg")
 
-sims=("cres" "spir" "rand")
-plats=(2 2 4)
-
-# Loop over n
-for i in {0..2}; do
-    sim=${sims[i]}
-    plat=${plats[i]}
-    # Loop over iterations
-    for j in {1..10}; do
-        # Define start and end
-        start=$((1 + 10 * (j - 1)))
-        end=$((10 * j))
-
+# Loop over models
+for model in models; do
+    # Loop over simtypes
+    for simtype in simtypes; do
         # Submit the job to SLURM with Rscript arguments
-        sbatch --job-name="sim${sim}_batch${j}" --time=0-23:59 highNbatch.sh $sim $plat $start $end
+        sbatch --job-name="sim${simtype}_model${model}" --time=0-11:59 highNbatch.sh $model $simtype
         sleep 1
     done
 done

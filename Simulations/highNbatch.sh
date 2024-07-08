@@ -9,19 +9,28 @@
 module load gcc/9.3.0 r/4.3.1
 export R_LIBS=~/local/R_libs/
 
-echo "Received arguments: $1 $2 $3 $4"
+echo "Received arguments: $1 $2"
 
 Rscript -e "
-sapply((paste0('../Core/', list.files('../Core/'))), source)
-
 args <- commandArgs(trailingOnly = TRUE)
+model <- as.character(args[1])
+simtype <- as.character(args[2])
 
-pobs <- 150 # Number of observed variables for S
+sapply((paste0("../Core/", list.files("../Core/"))), source)
+load("eeg_sim_params.rda")
+
+if(simtype == "eeg"){
+  pobs <- ncol(S_star) # Number of observed variables for S
+  plat <- max(Lout$z)
+} else if(simtype == "rand"){
+  pobs <- 150
+  plat <- 4
+} else{
+  pobs <- 150
+  plat <- 2
+}
 n <- 10000 # Number of observations
-simtype <- as.character(args[1])
-plat <- as.integer(args[2])
-start <- as.integer(args[3])
-end <- as.integer(args[4])
+iters <- 1:100
 
-runsim(simtype, 'rcLVGLASSO', pobs, plat, n, start:end) 
-" $1 $2 $3 $4
+runsim(simtype, model, pobs, plat, n, iters)
+" $1 $2
