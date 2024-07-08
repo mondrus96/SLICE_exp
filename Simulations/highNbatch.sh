@@ -6,7 +6,7 @@
 #SBATCH --mail-user=mondrus@ualberta.ca # Send email updates to you or someone else
 #SBATCH --mail-type=ALL                 # Send an email in all cases (job started, job ended, job aborted)
 
-module load gcc/9.3.0 r/4.3.1
+module load StdEnv/2023 gcc/13.3 r/4.4.0
 export R_LIBS=~/local/R_libs/
 
 echo "Received arguments: $1 $2"
