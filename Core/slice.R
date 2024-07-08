@@ -1,4 +1,4 @@
-library(clime)
+library(flare)
 library(glasso)
 library(RSpectra)
 library(huge)
@@ -35,11 +35,13 @@ slice <- function(Sigma, rho, rank, Sest = "glasso",
     if(Sest == "glasso"){
       S <- glasso(Matrix::chol2inv(Matrix::chol(E)), rho, thr = tol, maxit = maxiter)$wi
     } else if(Sest == "clime"){
-      S <- clime(Matrix::chol2inv(Matrix::chol(E)), rho, sigma = TRUE)$Omegalist[[1]]
+      S <- sugm(Matrix::chol2inv(Matrix::chol(E)), rho, 
+                method = "clime", verbose = FALSE)$icov[[1]]
     } else if(Sest == "gscad"){
       S <- gscad(Matrix::chol2inv(Matrix::chol(E)), rho)
     } else if(Sest == "huge_glasso"){
-      S <- huge(Matrix::chol2inv(Matrix::chol(E)), rho, method = "glasso", verbose = FALSE)$icov[[1]]
+      S <- huge(Matrix::chol2inv(Matrix::chol(E)), rho, 
+                method = "glasso", verbose = FALSE)$icov[[1]]
     }
     
     # Latent step
