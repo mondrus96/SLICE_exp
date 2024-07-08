@@ -21,7 +21,7 @@ load('eeg_sim_params.rda')
 
 if(simtype == 'eeg'){
   pobs <- ncol(S_star) # Number of observed variables for S
-  plat <- max(Lout$z)
+  plat <- max(Lout[[2]])
 } else if(simtype == 'rand'){
   pobs <- 150
   plat <- 4
