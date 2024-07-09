@@ -27,9 +27,9 @@ runsim <- function(simtype, method, pobs, plat = NULL, n, iters){
       load("eeg_sim_params.rda")
     }
     
-    L_star <- Lout$L; z_star <- Lout$z # True latent component; True cluster labels
+    L_star <- Lout$L; z_star <- Lout$z # Latent component; cluster labels
     
-    Sigma_star <- solve(S_star + L_star) # True Sigma
+    Sigma_star <- solve(S_star + L_star) # Sigma
     X <- mvrnorm(n, rep(0, pobs), Sigma = Sigma_star) # Finite sample data
     Sigma <- cov(X) # Sample Sigma
     
@@ -60,10 +60,13 @@ runsim <- function(simtype, method, pobs, plat = NULL, n, iters){
     }
     
     # Append to all outputs
-    S_hats[[i]] <- S; L_hats[[i]] <- L; S_stars[[i]] <- S_star; L_stars[[i]] <- L_star; z_stars[[i]] <- z_star
+    S_hats[[i]] <- S; L_hats[[i]] <- L
+    S_stars[[i]] <- S_star; L_stars[[i]] <- L_star; z_stars[[i]] <- z_star
     
     # Save as rda
-    save(S_hats, L_hats, S_stars, L_stars, z_stars, file = paste0(method, "/", method, "_sim", simtype, "_plat", 
-                                  plat, "_n", n, "_iters", min(iters), "to", max(iters), ".rda"))
+    save(S_hats, L_hats, S_stars, L_stars, z_stars, 
+         file = paste0(method, "/", method, "_sim", simtype, "_plat", 
+                       plat, "_n", n, "_iters", min(iters), 
+                       "to", max(iters), ".rda"))
   }
 }
