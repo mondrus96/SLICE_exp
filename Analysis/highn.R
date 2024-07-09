@@ -5,7 +5,8 @@ library(Matrix)
 ### Getting Summary Values ###
 sapply((paste0("../Core/", list.files("../Core/"))), source)
 # Get file names
-models <- c("SLICE", "nnLVGLASSO", "tGLASSO", "rcLVGLASSO")
+models <- c("SLICE", "SLICE_CLIME", "SLICE_GSCAD",
+            "nnLVGLASSO", "tGLASSO", "rcLVGLASSO")
 allsims <- data.frame()
 for(model in models){
   files <- list.files(paste0("../Simulations/", model, "/"), "n10000")
@@ -44,12 +45,15 @@ for(model in models){
           r <- rankMatrix(L_hats[[k]])
           
           # Do kmeans clustering
-          z_hat <- kmeans(eigL_hat$vectors[,1:plat], max(z_stars[[k]]), iter.max = 100, nstart = 1000)$cluster
+          z_hat <- kmeans(eigL_hat$vectors[,1:plat], max(z_stars[[k]]), 
+                          iter.max = 100, nstart = 1000)$cluster
           ARI[k] <- ari(z_stars[[k]], z_hat)
         }
       }
     }
-    allsims <- rbind(allsims, cbind(model, simtype, iters, TP, TN, F1, sin_theta, frob_norm, spec_norm, ARI)) # Add to df
+    allsims <- rbind(allsims, 
+                     cbind(model, simtype, iters, TP, TN, F1, 
+                           sin_theta, frob_norm, spec_norm, ARI)) # Add to df
   }
 }
 
@@ -66,9 +70,12 @@ allsims <- allsims %>%
 
 df_mean <- allsims %>%
   group_by(model, simtype) %>%
-  summarize(across(c(TP, TN, F1, sin_theta, frob_norm, spec_norm, ARI), mean, na.rm = TRUE), .groups = 'drop')
+  summarize(across(c(TP, TN, F1, 
+                     sin_theta, frob_norm, spec_norm, ARI), 
+                   mean, na.rm = TRUE), .groups = 'drop')
 write.table(df_mean, "highn_mean.txt")
 df_sd <- allsims %>%
   group_by(model, simtype) %>%
-  summarize(across(c(TP, TN, F1, sin_theta, frob_norm, spec_norm, ARI), sd, na.rm = TRUE), .groups = 'drop')
+  summarize(across(c(TP, TN, F1, sin_theta, frob_norm, spec_norm, ARI), 
+                   sd, na.rm = TRUE), .groups = 'drop')
 write.table(df_sd, "highn_sd.txt")

@@ -15,7 +15,7 @@ Rscript -e "
 args <- commandArgs(trailingOnly = TRUE)
 model <- as.character(args[1])
 simtype <- as.character(args[2])
-iters <- as.character(args[3])
+iter <- as.numeric(args[3])
 
 sapply((paste0('../Core/', list.files('../Core/'))), source)
 load('eeg_sim_params.rda')

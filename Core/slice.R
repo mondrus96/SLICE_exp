@@ -37,7 +37,7 @@ slice <- function(Sigma, rho, rank, Sest = "glasso",
                   thr = tol, maxit = maxiter)$wi
     } else if(Sest == "clime"){
       S <- clime(Matrix::chol2inv(Matrix::chol(E)), rho, 
-                sigma = TRUE, linsolver = "simplex")$Omegalist[[1]]
+                sigma = TRUE)$Omegalist[[1]]
       S[abs(S) < tol] <- 0
     } else if(Sest == "gscad"){
       S <- gscad(Matrix::chol2inv(Matrix::chol(E)), rho)
