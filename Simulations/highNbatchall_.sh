@@ -10,7 +10,7 @@ for model in "${models[@]}"; do
         # Loop over iterations
         for iter in "${iters[@]}"; do
             # Submit the job to SLURM with Rscript arguments
-            sbatch --job-name="sim${simtype}_model${model}_iter${iter}" --time=0-11:59 highNbatch.sh $model $simtype $iter
+            sbatch --job-name="sim${simtype}_model${model}_iter${iter}" --time=0-11:59 highNbatch_.sh $model $simtype $iter
             sleep 1
         done
     done
