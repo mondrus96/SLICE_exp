@@ -9,14 +9,18 @@ models <- c("SLICE", "SLICE_CLIME", "SLICE_GSCAD",
             "nnLVGLASSO", "tGLASSO", "rcLVGLASSO")
 allsims <- data.frame()
 for(model in models){
+  print(model)
   files <- list.files(paste0("../Simulations/", model, "/"), "n10000")
   for(j in 1:length(files)){
     load(paste0("../Simulations/", model, "/", files[j]))
-    simtype <- strsplit(files[j], "_")[[1]][2]
-    plat <- as.numeric(strsplit(strsplit(files[j], "_")[[1]][3], "plat")[[1]][2])
+    simtype <- strsplit(strsplit(files[j], paste0(model, "_"))[[1]][2], "_plat")[[1]][1]
+    plat <- as.numeric(strsplit(strsplit(files[j], "plat")[[1]][2], "_")[[1]][1])
     
     # Loop through each one
-    iters <- which(!sapply(S_stars, is.null))
+    indx <- which(!sapply(S_stars, is.null))
+    iters <- strsplit(strsplit(strsplit(files[j], "iters")[[1]][2], ".rda")[[1]][1], "to")[[1]]
+    iters <- as.numeric(iters[1]):as.numeric(iters[2])
+    iters <- iters[indx]
     F1 <- TP <- TN <- sin_theta <- frob_norm <- spec_norm <- ARI <- rep(NA, length(iters))
     for(k in 1:length(iters)){
       # Sparse metrics

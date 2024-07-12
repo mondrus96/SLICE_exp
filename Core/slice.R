@@ -37,8 +37,8 @@ slice <- function(Sigma, rho, rank, Sest = "glasso",
                   thr = tol, maxit = maxiter)$wi
     } else if(Sest == "clime"){
       S <- clime(Matrix::chol2inv(Matrix::chol(E)), rho, 
-                sigma = TRUE)$Omegalist[[1]]
-      S[abs(S) < tol] <- 0
+                sigma = TRUE, linsolver = "simplex")$Omegalist[[1]]
+      S[abs(S) < tol] <- 0 # Set abs values less than tol to zero
     } else if(Sest == "gscad"){
       S <- gscad(Matrix::chol2inv(Matrix::chol(E)), rho)
     } else if(Sest == "huge_glasso"){

@@ -35,7 +35,6 @@ cv.slice = function(X, folds = 3, rhos = logseq(1e-5, 0.1, 5), rs = c(2:6), Sest
   if(nrow(best) > 2){
     best <- best[1,]
   }
-  
   return(list(cvmat = cvmat, maxlogL = max(cvmat), 
               rho = rhos[best[2]], r = rs[best[1]]))
 }

@@ -36,26 +36,31 @@ sparsify <- function(matrix, k=100) {
   
   S[cbind(row_inds, col_inds)] <- max_vals
   S[cbind(col_inds, row_inds)] <- max_vals  # Because the matrix is symmetric
-  S <- makePD(S)
   return(S)
 }
 
 # Get S
-S_star <- sparsify(invcormat, k=100)
+S_star <- sparsify(invcormat, k=50)
+S_star <- 0.5*S_star
+S_star <- makePD(S_star)
 heatmap(1*(S_star != 0), Rowv = NA, Colv = NA)
+upp_tri <- S_star[upper.tri(S_star)]
+hist(upp_tri[upp_tri != 0])
+diag(S_star)[1]
 
 # Get L
 eigL <- eigen(cormat)
 plot(eigL$values[1:40], type = "l")
-abline(v = 6, col = "red")
-L_star <- eigL$vectors[,1:6] %*% diag(1/eigL$values[1:6]) %*% t(eigL$vectors[,1:6])
+r <- 7
+abline(v = r, col = "red")
+L_star <- eigL$vectors[,1:r] %*% diag(eigL$values[1:r]) %*% t(eigL$vectors[,1:r])
 heatmap(L_star, Rowv = NA, Colv = NA)
 
 # Define output
 Lout <- list()
 set.seed(123)
 Lout$L <- L_star
-Lout$z <- kmeans(eigL$vectors[,1:6], 6, nstart = 1000)$cluster
+Lout$z <- kmeans(eigL$vectors[,1:r], r, nstart = 1000)$cluster
 
 # Save parameter matrices
 save(S_star, Lout, file = "eeg_sim_params.rda")
