@@ -52,6 +52,8 @@ Lcres <- function(p, sd = 0){
   z <- c(rep(1, p %/% 2), rep(2, p - (p %/% 2))) # Cluster membership
   
   X <- X + matrix(rnorm(prod(dim(X)), mean = 0, sd = sd), nrow = nrow(X), ncol = ncol(X))
+  svdX <- svd(X); svdX$d <- svdX$d/10 # Dampen singular values
+  X <- svdX$u %*% diag(svdX$d) %*% t(svdX$v)
   
   indices <- sample(1:nrow(X)) # Permute indices
   X <- X[indices,]

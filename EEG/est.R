@@ -22,8 +22,7 @@ for(cond in conds){
   X <- Xs[[cond]]
   #cvslis[[cond]] <- cv.slice(X, rhos = logseq(0.05, 0.1, 4),
   #                           rs = 2:10, Sest = "huge_glasso")
-  cvslis[[cond]] <- cv.slice(X, folds = 5, rhos = 0.2,
-                             rs = 7:10, Sest = "huge_glasso")
+  cvslis[[cond]] <- cv.slice(X, rhos = 1e-5, rs = 15:20, Sest = "huge_glasso")
   slis[[cond]] <- slice(cov(X), cvslis[[cond]]$rho, 
                         cvslis[[cond]]$r, Sest = "huge_glasso")
 }
