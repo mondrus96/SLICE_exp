@@ -49,11 +49,14 @@ hist(upp_tri[upp_tri != 0])
 diag(S_star)[1]
 
 # Get L
+load("../EEG/ests.rda")
 eigL <- eigen(cormat)
 plot(eigL$values[1:40], type = "l")
-r <- 7
+r <- cvslis$Famous$r
 abline(v = r, col = "red")
-L_star <- eigL$vectors[,1:r] %*% diag(eigL$values[1:r]) %*% t(eigL$vectors[,1:r])
+L_star <- eigL$vectors[,1:r] %*% 
+  diag(eigL$values[1:r]) %*% 
+  t(eigL$vectors[,1:r]) # Dampen eigenvalues
 heatmap(L_star, Rowv = NA, Colv = NA)
 
 # Define output
