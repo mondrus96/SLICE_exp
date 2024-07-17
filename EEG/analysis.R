@@ -1,5 +1,6 @@
 library(ggplot2)
 library(dplyr)
+library(Rtsne)
 
 # Load data and functions
 sapply((paste0("../Core/", list.files("../Core/"))), source)
@@ -10,7 +11,6 @@ sapply(cvslis, "[[", "r")
 
 # Intragroup statistics
 Ls <- lapply(slis, "[[", 2) # Get Ls
-eigvecs_df <- list()
 intra_df <- c()
 for(i in seq_along(Ls)){
   r <- slis[[i]]$rank
@@ -20,7 +20,6 @@ for(i in seq_along(Ls)){
   eigL <- eigen(L)
   df <- as.data.frame(eigL$vectors[,1:2])
   df <- cbind(df, group = names(Ls)[i])
-  eigvecs_df <- rbind(eigvecs_df, df)
   
   # Norms
   frob_norm <- norm(L, "F")
@@ -41,12 +40,6 @@ colnames(intra_df) <- c("group", "frob_norm", "spec_norm",
                         "min_clust", "max_clust")
 rownames(intra_df) <- NULL
 print(intra_df)
-
-# Scatter plot of eigenvectors
-ggplot(eigvecs_df, aes(x = V1, y = V2, color = group)) +
-  geom_point(size = 3) +
-  labs(title = "Scatter Plot of Eigenvectors", x = "X1", y = "X2") +
-  theme_minimal()
 
 # Intergroup statistics
 inter_df <- matrix(c(1, 2, 1, 2, 3, 3), 3, 2) # Groups to compare
@@ -69,4 +62,26 @@ for(i in 1:nrow(inter_df)){
 }
 inter_df <- cbind(inter_df, sin_theta, frob_norm, spec_norm, adj_rand_indx)
 print(inter_df)
-save(inter_df, intra_df, eigvecs_df, file = paste0(rho, "out.rda"))
+
+# Subject separate estimates
+conds <- names(slis_all)
+eigvecs <- group <- c()
+for(i in 1:16){
+  for(cond in conds){
+    L <- slis_all[[cond]][[i]]$L
+    eigL <- eigen(L)
+    eigvecs <- rbind(eigvecs, t(eigL$vectors[,1]))
+    group <- c(group, cond)
+  }
+}
+
+# t-SNE
+set.seed(123)
+tsne_result <- Rtsne(as.matrix(eigvecs), dims = 2, perplexity = 10, verbose = TRUE, max_iter = 1000)
+tsne_df <- data.frame(group = group, X1 = tsne_result$Y[,1], X2 = tsne_result$Y[,2])
+
+# Scatter plot of eigenvectors
+ggplot(tsne_df, aes(x = X1, y = X2, color = group)) +
+  geom_point(size = 3) +
+  labs(title = "Scatter Plot of Eigenvectors", x = "X1", y = "X2") +
+  theme_minimal()

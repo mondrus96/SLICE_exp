@@ -10,9 +10,11 @@ models <- c("SLICE", "SLICE_CLIME", "SLICE_GSCAD",
 allsims <- data.frame()
 for(model in models){
   print(model)
-  files <- list.files(paste0("../Simulations/", model, "/"), "n10000")
+  #files <- list.files(paste0("../Simulations/", model, "/"), "n10000")
+  files <- list.files(paste0("./", model, "/"), "n10000")
   for(j in 1:length(files)){
-    load(paste0("../Simulations/", model, "/", files[j]))
+    #load(paste0("../Simulations/", model, "/", files[j]))
+    load(paste0("./", model, "/", files[j]))
     simtype <- strsplit(strsplit(files[j], paste0(model, "_"))[[1]][2], "_plat")[[1]][1]
     plat <- as.numeric(strsplit(strsplit(files[j], "plat")[[1]][2], "_")[[1]][1])
     
@@ -22,7 +24,7 @@ for(model in models){
     iters <- as.numeric(iters[1]):as.numeric(iters[2])
     iters <- iters[indx]
     F1 <- TP <- TN <- sin_theta <- frob_norm <- spec_norm <- ARI <- rep(NA, length(iters))
-    for(k in 1:length(iters)){
+    for(k in (iters - min(iters) + 1)){
       # Sparse metrics
       F1[k] <- F1score(S_stars[[k]], S_hats[[k]])
       TP[k] <- TPrate(S_stars[[k]], S_hats[[k]])
@@ -62,7 +64,6 @@ for(model in models){
 }
 
 # Get summary values
-rm(list = setdiff(ls(), "allsims"))
 allsims <- allsims %>%
   mutate(TP = as.numeric(TP),
          TN = as.numeric(TN),
@@ -77,9 +78,9 @@ df_mean <- allsims %>%
   summarize(across(c(TP, TN, F1, 
                      sin_theta, frob_norm, spec_norm, ARI), 
                    mean, na.rm = TRUE), .groups = 'drop')
-write.table(df_mean, "highn_mean.txt")
+write.table(df_mean, "highNmean.txt")
 df_sd <- allsims %>%
   group_by(model, simtype) %>%
   summarize(across(c(TP, TN, F1, sin_theta, frob_norm, spec_norm, ARI), 
                    sd, na.rm = TRUE), .groups = 'drop')
-write.table(df_sd, "highn_sd.txt")
+write.table(df_sd, "highNsd.txt")

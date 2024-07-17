@@ -56,12 +56,6 @@ L1_shr <- function(a, kappa){
 }
 
 nucl_shr <- function(a, kappa, tol){
-  #if(det(a) < tol){
-  #  return(a)
-  #} else{
-  #  a = eigen(a, symmetric = TRUE)
-  #  return(a$vectors %*% diag(pmax(0, a$values - kappa)) %*% t(a$vectors))
-  #}
   a = eigen(a, symmetric = TRUE)
   return(a$vectors %*% diag(pmax(0, a$values - kappa)) %*% t(a$vectors))
 }

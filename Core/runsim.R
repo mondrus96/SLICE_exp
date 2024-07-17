@@ -35,15 +35,27 @@ runsim <- function(simtype, method, pobs, plat = NULL, n, iters){
     
     # Model selection and parameter estimation
     if(method == "SLICE"){
-      cvsli <- cv.slice(X)
+      if(simtype == "eeg"){
+        cvsli <- cv.slice(X, rs = 5:10)
+      } else{
+        cvsli <- cv.slice(X) 
+      }
       sli <- slice(Sigma, cvsli$rho, cvsli$r)
       S <- sli$S; L <- sli$L
     } else if(method == "SLICE_GSCAD"){
-      cvsli <- cv.slice(X, Sest = "gscad")
+      if(simtype == "eeg"){
+        cvsli <- cv.slice(X, rs = 5:10, Sest = "gscad")
+      } else{
+        cvsli <- cv.slice(X, Sest = "gscad")
+      }
       sli <- slice(Sigma, cvsli$rho, cvsli$r, Sest = "gscad")
       S <- sli$S; L <- sli$L
     } else if(method == "SLICE_CLIME"){
-      cvsli <- cv.slice(X, Sest = "clime")
+      if(simtype == "eeg"){
+        cvsli <- cv.slice(X, rs = 5:10, Sest = "clime")
+      } else{
+        cvsli <- cv.slice(X, Sest = "clime")
+      }
       sli <- slice(Sigma, cvsli$rho, cvsli$r, Sest = "clime")
       S <- sli$S; L <- sli$L
     } else if(method == "nnLVGLASSO"){
@@ -51,7 +63,11 @@ runsim <- function(simtype, method, pobs, plat = NULL, n, iters){
       nnlvg <- nnlvg(Sigma, cvnnlvg$rho, cvnnlvg$gamma)
       S <- nnlvg$S; L <- nnlvg$L
     } else if(method == "rcLVGLASSO"){
-      cvrclvg <- cv.rclvg(X)
+      if(simtype == "eeg"){
+        cvrclvg <- cv.rclvg(X, rs = 5:10)
+      } else{
+        cvrclvg <- cv.rclvg(X)
+      }
       rclvg <- rclvg(Sigma, cvrclvg$rho, cvrclvg$r)
       S <- rclvg$S; L <- rclvg$L
     } else if(method == "tGLASSO"){

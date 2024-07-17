@@ -21,15 +21,16 @@ L_star <- Lout$L; z_star <- Lout$z # True latent component; True cluster labels
 Sigma_star <- solve(S_star + L_star) # True Sigma
 
 # Generate sample covariance
-X <- mvrnorm(10000, rep(0, pobs), Sigma_star)
+X <- mvrnorm(1000, rep(0, pobs), Sigma_star)
 Sigma <- cov(X)
 
 ### Estimate w/ diff Sests ###
 outs <- vector("list", 4)
 outs[[1]] <- list(S = S_star, L = L_star)
 models <- c("glasso", "clime", "gscad")
+rhos <- c(0.05, 0.07, 0.05)
 for(i in seq_along(models)){
-  out <- slice(Sigma, 0.12, plat, models[i])
+  out <- slice(Sigma, rhos[i], plat, Sest = models[i])
   out$S[abs(out$S) < 1e-5] <- 0
   outs[[i + 1]] <- list(S = out$S, L = out$L)
 }
@@ -38,23 +39,24 @@ names(outs) <- c("true", models)
 ### Generate plots ###
 for(i in seq_along(outs)){
   png(paste0(names(outs)[i], "_S.png"), width = 600, height = 600)
-  heatmap(x = 1*(outs[[i]]$S != 0),
-          Rowv = NA,  # Disable row clustering
-          Colv = NA,  # Disable column clustering
-          symm = TRUE, # Indicates the matrix is symmetric
-          scale = "none", # Don't scale the data
-          labRow = "", # Remove x-axis label
-          labCol = "", # Remove y-axis label
-          col = colorRampPalette(c("white", "black"))(256)) # Black & White color scheme
+  pheatmap(1*(outs[[i]]$S != 0), 
+           cluster_rows = FALSE, 
+           cluster_cols = FALSE,
+           color = colorRampPalette(c("white", "black"))(256),
+           show_rownames = FALSE, 
+           show_colnames = FALSE, 
+           legend = FALSE,
+           border_color = NA)
   dev.off()
+  
   png(paste0(names(outs)[i], "_L.png"), width = 600, height = 600)
-  heatmap(x = outs[[i]]$L,
-          Rowv = NA,  # Disable row clustering
-          Colv = NA,  # Disable column clustering
-          symm = TRUE, # Indicates the matrix is symmetric
-          scale = "none", # Don't scale the data
-          labRow = "", # Remove x-axis label
-          labCol = "", # Remove y-axis label
-          col = colorRampPalette(c("white", "black"))(256)) # Black & White color scheme
+  pheatmap(outs[[i]]$L, 
+           cluster_rows = FALSE, 
+           cluster_cols = FALSE,
+           color = colorRampPalette(c("white", "black"))(256),
+           show_rownames = FALSE, 
+           show_colnames = FALSE, 
+           legend = FALSE,
+           border_color = NA)
   dev.off()
 }

@@ -1,6 +1,6 @@
 library(glasso)
 
-ebic.tg = function(X, rhos = NULL, taus = logseq(1e-5, 0.2, 20)){
+ebic.tg = function(X, rhos = logseq(1e-5, 0.01, 5), taus = logseq(1e-5, 0.2, 5)){
   # X = input data matrix
   # rho = vector of rhos to try
   # tau = vector of thresholds to try
@@ -8,8 +8,8 @@ ebic.tg = function(X, rhos = NULL, taus = logseq(1e-5, 0.2, 20)){
   p <- ncol(X); n <- nrow(X) # dimensions of X
   Sigma <- cov(X)
   
-  o <- sqrt(log(p)/n)
-  rhos <- seq(o-(0.05*o), o+(0.05*o), length.out = 9)
+  #o <- sqrt(log(p)/n)
+  #rhos <- seq(o-(0.05*o), o+(0.05*o), length.out = 9)
   
   # Get best rho
   ebicvec <- c()
