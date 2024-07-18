@@ -1,3 +1,4 @@
+library(dplyr)
 sapply((paste0("../Core/", list.files("../Core/"))), source)
 
 # Load data
@@ -33,10 +34,10 @@ frob.normalize <- function(mat) {
 # 3: Use CV once, set for all remaining
 
 # Set params
-params <- list(sli = c(0.25, 9),
-               nnlvg = c(0.35, 0.014),
-               rclvg = c(0.1, 9),
-               tg = c(0.01, 0.2))
+params <- list(sli = c(0.15, 9),
+               nnlvg = c(0.1, 0.007),
+               rclvg = c(0.15, 9),
+               tg = c(0.15, 0.2))
 
 # Define a list of model functions
 models <- list(
@@ -46,75 +47,63 @@ models <- list(
   tg = ebic.tg
 )
 
-# Run estimation of first iteration
-set.seed(123)
-X <- Xs[["Famous"]]
-X <- X[sample(nrow(X)),] # Shuffle rows
-mid <- nrow(X)/2
-train <- 1:mid; test <- (mid + 1):nrow(X)
-
 # Loop over models
-model_outs <- list()
-for(i in seq_along(models)){
-  print(names(models)[i])
-  model <- models[[i]]
-  
-  # Train and test
-  train_out <- model(cov(X[train,]), 
-                     params[[i]][1], 
-                     params[[i]][2])
-  test_out <- model(cov(X[test,]), 
-                    params[[i]][1], 
-                    params[[i]][2])
-  model_outs[[names(models)[i]]] <- list(train = train_out, 
-                                         test = test_out)
-  
-  # Compare sparsity of S and rank of L
-  train_s <- train_out$S; test_s <- test_out$S
-  train_s <- train_s[upper.tri(train_s)]; test_s <- test_s[upper.tri(test_s)]
-  print(paste0(names(models)[i], " - train s: ", 
-               sum(train_s == 0)/length(train_s),
-               ", test s: ", sum(test_s == 0)/length(test_s)))
-  
-  if(names(models)[i] != "tg"){
-    train_r <- train_out$L; test_r <- test_out$L
-    train_r <- sum(eigen(train_r)$values > 1e-3)
-    test_r <- sum(eigen(test_r)$values > 1e-3)
-    print(paste0(names(models)[i], " - train r: ", 
-                 train_r, ", test r: ", test_r))
+X <- Xs[["Famous"]]
+all_s <- all_r <- model_name <- ARI_score <- F1_score <- df <- c()
+for(iter in 1:100){ # Loop over iterations
+  print(paste0("ITER: ", iter))
+  set.seed(123*iter)
+  X <- X[sample(nrow(X)),] # Shuffle rows
+  mid <- nrow(X)/2
+  train <- 1:mid; test <- (mid + 1):nrow(X)
+  #for(i in seq_along(models)){
+  for(i in 1:2){
+    model_name <- c(model_name, names(models)[i])
+    model <- models[[i]]
+    
+    # Train and test
+    train_out <- model(cov(X[train,]), 
+                       params[[i]][1], 
+                       params[[i]][2])
+    test_out <- model(cov(X[test,]), 
+                      params[[i]][1], 
+                      params[[i]][2])
+    model_outs[[names(models)[i]]] <- list(train = train_out, 
+                                           test = test_out)
+    
+    # Compare sparsity of S and rank of L
+    train_s <- train_out$S; test_s <- test_out$S
+    train_s <- train_s[upper.tri(train_s)]; test_s <- test_s[upper.tri(test_s)]
+    avg_s <- (sum(train_s == 0)/length(train_s) + 
+                sum(test_s == 0)/length(test_s))/2
+    all_s <- c(all_s, avg_s)
+    
+    if(names(models)[i] != "tg"){
+      train_r <- train_out$L; test_r <- test_out$L
+      train_r <- sum(eigen(train_r)$values > 1e-3)
+      test_r <- sum(eigen(test_r)$values > 1e-3)
+      avg_r <- (train_r + test_r)/2
+      all_r <- c(all_r, avg_r)
+    } else{
+      all_r <- c(all_r, NA)
+    }
+    
+    # Compare train and test
+    F1_score <- c(F1_score, 
+                  F1score(train_out$S, test_out$S))
+    if(names(models[i]) == "tg"){
+      ARI_score <- c(ARI_score, NA)
+    } else{
+      train_eigL <- eigen(train_out$L)$vectors[,1:train_r]
+      test_eigL <- eigen(test_out$L)$vectors[,1:test_r]
+      train_c <- kmeans(train_eigL, train_r, 10000)$cluster
+      test_c <- kmeans(test_eigL, test_r, 10000)$cluster
+      ARI_score <- c(ARI_score, ari(train_c, test_c))
+    }
+    df <- rbind(df, data.frame(model_name, all_s, all_r, F1_score, ARI_score))
   }
-}
-    
-# 100 iterations of 2-fold CV
-for(cond in conds){ # Loop over conditions
-  for(iter in 2:100){ # Loop over iterations
-    set.seed(123*iter)
-    X <- Xs[[cond]]
-    X <- X[sample(nrow(X)),] # Shuffle rows
-    mid <- nrow(X)/2
-    train <- 1:mid; test <- (mid + 1):nrow(X)
-    
-    sli_train <- slice(cov(X[train,]), cvsli$rho, cvsli$r) # Train
-    rclvg_train <- rclvg(cov(X[train,]), cvrclvg$rho, cvrclvg$r)
-    nnlvg_train <- nnlvg(cov(X[train,]), cvnnlvg$rho, cvnnlvg$gamma)
-    
-    sli_test <- slice(cov(X[test,]), cvsli$rho, cvsli$r) # Test
-    rclvg_test <- rclvg(cov(X[test,]), cvrclvg$rho, cvrclvg$r)
-    nnlvg_test <- nnlvg(cov(X[test,]), cvnnlvg$rho, cvnnlvg$gamma)
-    
-    out1 <- frob.normalize(nnlvg_train$L)
-    out2 <- frob.normalize(nnlvg_test$L)
-    out3 <- frob.normalize(sli_train$L)
-    out4 <- frob.normalize(sli_test$L)
-    
-    print(norm(out1 - out2, "F"))
-    print(norm(out3 - out4, "F"))
-    
-    #sli1 <- eigen(sli_train$L)$vectors[,1]; sli2 <- eigen(sli_test$L)$vectors[,1]
-    #nnlvg1 <- eigen(nnlvg_train$L)$vectors[,1]; nnlvg2 <- eigen(nnlvg_test$L)$vectors[,1]
-    
-    #sli_ang <- c(sli_ang, sintheta(sli1, sli2)); nnlvg_ang <- c(nnlvg_ang, sintheta(nnlvg1, nnlvg2))
-    #sli_ang <- sintheta(sli1, sli2); nnlvg_ang <- sintheta(nnlvg1, nnlvg2)
-    #print(paste0("slice:", mean(sli_ang), " nnvlg:", mean(nnlvg_ang)))
-  }
+  mean_df <- df %>%
+    group_by(model_name) %>%
+    summarise(across(where(is.numeric), mean, na.rm = TRUE))
+  print(mean_df)
 }
