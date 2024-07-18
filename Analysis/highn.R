@@ -10,11 +10,9 @@ models <- c("SLICE", "SLICE_CLIME", "SLICE_GSCAD",
 allsims <- data.frame()
 for(model in models){
   print(model)
-  #files <- list.files(paste0("../Simulations/", model, "/"), "n10000")
-  files <- list.files(paste0("./", model, "/"), "n10000")
+  files <- list.files(paste0("../Simulations/", model, "/"), "n10000")
   for(j in 1:length(files)){
-    #load(paste0("../Simulations/", model, "/", files[j]))
-    load(paste0("./", model, "/", files[j]))
+    load(paste0("../Simulations/", model, "/", files[j]))
     simtype <- strsplit(strsplit(files[j], paste0(model, "_"))[[1]][2], "_plat")[[1]][1]
     plat <- as.numeric(strsplit(strsplit(files[j], "plat")[[1]][2], "_")[[1]][1])
     
