@@ -1,20 +1,30 @@
 # Extended Bayes Information Criterion
-ebic = function(likl, p, n, k, gamma = 0.5){
+ebic <- function(likl, p, n, k, gamma = 0.5){
   return(-2 * likl + k * log(n) + 2 * gamma * k * log(p))
 }
 
 # Bayes Information Criterion
-bic = function(likl, n, k){
+bic <- function(likl, n, k){
   return(-2*likl + k*log(n))
 }
 
 # Log likelihood function
-logL = function(Sigma, invSigmahat){
+logL <- function(Sigma, invSigmahat){
   return(log(det(invSigmahat)) - sum(diag(Sigma %*% (invSigmahat))))
 }
 
+# Likelihood ratio test
+L.ratio.test <- function(likl_0, likl_A, df){
+  # likl_0 = likelihood of null hypothesis
+  # likl_A = likelihood of alternative hypothesis
+  # df = degrees of freedom
+  test_stat <- -2 * (likl_0 - likl_A) # test statistic
+  p_value <- pchisq(test_stat, df, lower.tail = FALSE) # calculate p-value
+  return(list(test_stat = test_stat, p_value = p_value))
+}
+
 # Make a matrix positive definite by adding a small value to diagonal
-makePD = function(mat){
+makePD <- function(mat){
   p = ncol(mat)
   eigvals = suppressWarnings(eigs(mat, ncol(mat), opts = list(retvec = FALSE))$values)
   perturb = max(max(eigvals) - p*min(eigvals), 0)/(p-1)
@@ -23,11 +33,11 @@ makePD = function(mat){
 }
 
 # Check if a matrix is PD through Cholesky decomposition (faster than full eigendecomp)
-isPD = function(mat){
+isPD <- function(mat){
   tryCatch({
     chol(mat)
     return(TRUE)
-  }, error = function(e){
+  }, error = function(e) {
     return(FALSE)
   })
 }
