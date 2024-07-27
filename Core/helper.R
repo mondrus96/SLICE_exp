@@ -13,16 +13,6 @@ logL <- function(Sigma, invSigmahat){
   return(log(det(invSigmahat)) - sum(diag(Sigma %*% (invSigmahat))))
 }
 
-# Likelihood ratio test
-L.ratio.test <- function(likl_0, likl_A, df){
-  # likl_0 = likelihood of null hypothesis
-  # likl_A = likelihood of alternative hypothesis
-  # df = degrees of freedom
-  test_stat <- -2 * (likl_0 - likl_A) # test statistic
-  p_value <- pchisq(test_stat, df, lower.tail = FALSE) # calculate p-value
-  return(list(test_stat = test_stat, p_value = p_value))
-}
-
 # Make a matrix positive definite by adding a small value to diagonal
 makePD <- function(mat){
   p = ncol(mat)
