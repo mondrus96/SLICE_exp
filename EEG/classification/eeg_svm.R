@@ -130,4 +130,56 @@ for(model in models){
   mats[[model]] <- mat
   save(mats, file = "svmmats.rda")
 }
+
+# For getting best results from all combinations
+svmouts <- list()
+for(model in models){
+  # Load matrix and find the best
+  mat <- mats[[model]]
+  best <- which(mat == max(mat), arr.ind = TRUE)
+  if(model == "nnlvg"){
+    param1 <- lambdas[best[1]]; param2 <- lambdas[best[2]]
+  } else{
+    param1 <- lambdas[best[1]]; param2 <- rs[best[2]]
+  }
+  
+  set.seed(123) # For sampling
+  X_train <- y_train <- X_test <- y_test <- c()
+  for(cond in conds){
+    X <- Xs[[cond]]
+    X <- X[sample(nrow(X)), ]
+    n1 <- nrow(X)/2
+    train_cov <- cov(X[1:n1, ]) # Covariances used
+    test_cov <- cov(X[(n1 + 1):nrow(X), ])
+    
+    clusterSetRNGStream(cl, 123) # For parallel processes
+    results <- parLapply(cl, 1:reps, inner.loop, model,
+                         train_cov, test_cov, n2, param1, param2)
+    
+    # Collect results
+    X_train_rows <- lapply(results, function(x) x$X_train_row)
+    X_test_rows <- lapply(results, function(x) x$X_test_row)
+    
+    X_train <- rbind(X_train, do.call(rbind, X_train_rows))
+    X_test <- rbind(X_test, do.call(rbind, X_test_rows))
+    
+    y_train <- c(y_train, rep(cond, reps))
+    y_test <- c(y_test, rep(cond, reps))
+  }
+  
+  # Shuffle data
+  row_perm <- sample(nrow(X_train))
+  X_train <- X_train[row_perm,]; y_train <- y_train[row_perm]
+  row_perm <- sample(nrow(X_test))
+  X_test <- X_test[row_perm,]; y_test <- y_test[row_perm]
+  
+  # SVM classifier
+  svm_model <- svm(X_train, as.factor(y_train), 
+                   type = "C-classification", kernel = "radial")
+  y_pred <- as.character(predict(svm_model, X_test))
+  
+  # Append to svmouts
+  svmouts[[model]] <- list(y_pred = y_pred, y_test = y_test)
+  save(svmouts, file = "svmouts.rda")
+}
 stopCluster(cl)
