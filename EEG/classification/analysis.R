@@ -18,8 +18,6 @@ for(model in names(svmouts)){
   # Plot the heatmap with the specified customizations
   if(model == "slice"){
     model_nme <- "SLICE"
-  } else if(model == "rclvg"){
-    model_nme <- "rcLVG"
   } else if(model == "nnlvg"){
     model_nme <- "nnLVG"
   }

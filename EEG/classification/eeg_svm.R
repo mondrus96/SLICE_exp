@@ -29,8 +29,7 @@ inner.loop <- function(iter, model, train_cov, test_cov, n2, param1, param2){
   # Define a named list of functions for each model
   model_funcs <- list(
     slice = slice,
-    nnlvg = nnlvg,
-    rclvg = rclvg
+    nnlvg = nnlvg
   )
   
   # Train and test data
@@ -52,8 +51,7 @@ clusterExport(cl, c("mvrnorm", "slice", "eigs", "objective",
                     "inner.loop", "glasso", "n2", "cov", 
                     "eigen", "svds", "nucl_norm", "logL", 
                     "makePD", "isPD", "nucl_shr", "Diagonal", 
-                    "nnlvg", "L1_shr", "rclvg", "Estep",
-                    "Mstep", "forceSymmetric"))
+                    "nnlvg", "L1_shr"))
 clusterEvalQ(cl, {
   library(MASS)
   library(e1071)
@@ -66,7 +64,7 @@ rs <- 6:10
 param_len <- length(lambdas)
 
 mats <- list()
-models <- c("slice", "nnlvg", "rclvg")
+models <- c("nnlvg", "slice")
 
 # Loop over models
 for(model in models){
