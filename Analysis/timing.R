@@ -5,7 +5,7 @@ sapply((paste0("../Core/", list.files("../Core/"))), source)
 # Settings
 pobs <- c(100, 250, 500, 1000, 2500)
 plat <- 7
-lambda <- 0.01
+rho <- 0.01
 gamma <- 0.001
 
 # Run SLICE function
@@ -16,7 +16,7 @@ rm(L_star, Lout, S_star)
 
 # Check profile of function
 Rprof("slice_profile.out")
-out <- slice(Sigma, lambda, plat)
+out <- slice(Sigma, rho, plat)
 Rprof(NULL)
 summary <- summaryRprof("slice_profile.out")
 print(summary)
@@ -46,13 +46,13 @@ for(i in seq_along(pobs)){
   # Loop through models
   for(j in seq_along(models)){
     if(models[j] == "SLICE_glasso"){
-      T <- runtiming(Sigma, slice, lambda, plat, Sest = "glasso")
+      T <- runtiming(Sigma, slice, rho, plat, Sest = "glasso")
     } else if(models[j] == "SLICE_huge_glasso"){
-      T <- runtiming(Sigma, slice, lambda, plat, Sest = "huge_glasso")
+      T <- runtiming(Sigma, slice, rho, plat, Sest = "huge_glasso")
     } else if(models[j] == "rcLVGLASSO"){
-      T <- runtiming(Sigma, rclvg, lambda, plat)
+      T <- runtiming(Sigma, rclvg, rho, plat)
     } else if(models[j] == "nnLVGLASSO"){
-      T <- runtiming(Sigma, nnlvg, lambda, gamma)
+      T <- runtiming(Sigma, nnlvg, rho, gamma)
     }
     T <- ifelse(is.null(T), NA, as.numeric(T))
     out[i, j] <- T

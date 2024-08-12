@@ -26,7 +26,7 @@ nnlvg <- function(Sigma, rho, gamma, lambda = 1, maxiter = 100, tol = 1e-3){
     
     # L-update
     Lold <- L
-    L <- nucl_shr(R - S, gamma / lambda, tol)
+    L <- nucl_shr(R - S, gamma / lambda)
     L <- (L + t(L))/2
     
     # Update dual variable
@@ -55,8 +55,8 @@ L1_shr <- function(a, kappa){
   return(sign(a) * pmax(0, abs(a) - kappa))
 }
 
-nucl_shr <- function(a, kappa, tol){
-  a = eigen(a, symmetric = TRUE)
+nucl_shr <- function(a, kappa){
+  a <- eigen(a, symmetric = TRUE)
   return(a$vectors %*% diag(pmax(0, a$values - kappa)) %*% t(a$vectors))
 }
 
