@@ -5,6 +5,7 @@ sapply((paste0("../Core/", list.files("../Core/"))), source)
 Xs <- list()
 conds <- c("Famous", "Scrambled", "Unfamiliar")
 dirs <- list.dirs(recursive = FALSE)
+dirs <- dirs[!grepl("classification", dirs)]
 # Loop over conditions
 for(cond in conds){
   # Loop over subjects
@@ -15,6 +16,7 @@ for(cond in conds){
   }
   Xs[[cond]] <- scale(Xs[[cond]]) # Scale data
 }
+sapply(ncol())
 
 # Run estimation
 set.seed(123)
