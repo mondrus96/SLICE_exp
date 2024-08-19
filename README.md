@@ -20,7 +20,7 @@ The second step is a sparse Gaussian graphical model problem of the sample covar
 ```
 
 ## Simulations
-We show improved recovery of both sparse and low rank components against the state-of-the-art ([tGLASSO; Wang and Allen, 2023](https://academic.oup.com/biomet/article-abstract/110/3/681/6820916?redirectedFrom=fulltext), [rcLVG; Yuan, 2012](https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-4/Discussion-Latent-variable-graphical-model-selection-via-convex-optimization/10.1214/12-AOS979.full?tab=ArticleLink), [nnLVG; Chandrasekaran et al., 2012](https://www.jstor.org/stable/41806519)). Importantly, we drastically improve upon current methods in estimating the low rank, latent component. An example of this improvement is best shown in the following comparison:
+We show improved recovery of both sparse (in F1 score) and low rank (in all measures) components against the state-of-the-art ([tGLASSO; Wang and Allen, 2023](https://academic.oup.com/biomet/article-abstract/110/3/681/6820916?redirectedFrom=fulltext), [rcLVG; Yuan, 2012](https://projecteuclid.org/journals/annals-of-statistics/volume-40/issue-4/Discussion-Latent-variable-graphical-model-selection-via-convex-optimization/10.1214/12-AOS979.full?tab=ArticleLink), [nnLVG; Chandrasekaran et al., 2012](https://www.jstor.org/stable/41806519)). Importantly, we drastically improve upon current methods in estimating the low rank, latent component. An example of this improvement is best shown in the following comparison:
 
 ![Crescent recovery](Analysis/cres.png)
 ![Spiral recovery](Analysis/spir.png)
