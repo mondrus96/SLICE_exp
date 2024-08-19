@@ -1,0 +1,122 @@
+library(ggplot2)
+library(dplyr)
+library(Rtsne)
+library(pheatmap)
+library(viridis)
+
+# Load data and functions
+sapply((paste0("../Core/", list.files("../Core/"))), source)
+load("ests.rda")
+
+# Look at rank
+sapply(cvslis, "[[", "r")
+
+### Intragroup statistics
+Ls <- lapply(slis, "[[", 2) # Get Ls
+intra_df <- c()
+for(i in seq_along(Ls)){
+  r <- slis[[i]]$rank
+  L <- Ls[[i]]
+  
+  # Eigendecomp
+  eigL <- eigen(L)
+  df <- as.data.frame(eigL$vectors[,1:2])
+  df <- cbind(df, group = names(Ls)[i])
+  
+  # Norms
+  frob_norm <- norm(L, "F")
+  spec_norm <- norm(L, "2")
+  
+  # Clustering
+  clusts <- table(kmeans(eigL$vectors[,1:r], r, 1000)$cluster)
+  min_clust <- min(clusts)
+  max_clust <- max(clusts)
+  
+  # Append
+  row <- c(frob_norm, spec_norm, min_clust, max_clust)
+  intra_df <- rbind(intra_df, row)
+}
+intra_df <- as.data.frame(intra_df)
+intra_df <- cbind(names(slis), intra_df)
+colnames(intra_df) <- c("group", "frob_norm", "spec_norm", 
+                        "min_clust", "max_clust")
+rownames(intra_df) <- NULL
+print(intra_df)
+
+### Intergroup statistics
+inter_df <- matrix(c(1, 2, 1, 2, 3, 3), 3, 2) # Groups to compare
+inter_df <- as.data.frame(inter_df)
+sin_theta <- frob_norm <- spec_norm <- adj_rand_indx <- c()
+for(i in 1:nrow(inter_df)){
+  set.seed(123)
+  r <- slis[[i]]$rank
+  g1 <- inter_df[i,1]; g2 <- inter_df[i,2]
+  L1 <- Ls[[g1]]; L2 <- Ls[[g2]]
+  eigL1 <- eigen(L1); eigL2 <- eigen(L2)
+  
+  sin_theta <- c(sin_theta,
+                 sintheta(eigL1$vectors[,1], eigL2$vectors[,1]))
+  
+  frob_norm <- c(frob_norm, norm(L1 - L2, type = "F"))
+  spec_norm <- c(spec_norm, norm(L1 - L2, type = "2"))
+  
+  clust1 <- kmeans(eigL1$vectors[,1:r], r, 10000)$cluster
+  clust2 <- kmeans(eigL2$vectors[,1:r], r, 10000)$cluster
+  adj_rand_indx <- c(adj_rand_indx, ari(clust1, clust2))
+  
+  png(paste0(g1, g2, "_L.png"), width = 600, height = 600)
+  pheatmap((L1 - L2)^2,
+           cluster_rows = FALSE, 
+           cluster_cols = FALSE,
+           color = viridis(256),
+           breaks = seq(0.01, 0.02, length.out = 257),
+           show_rownames = FALSE, 
+           show_colnames = FALSE, 
+           legend = FALSE,
+           border_color = NA)
+  dev.off()
+}
+inter_df <- cbind(inter_df, sin_theta, frob_norm, spec_norm, adj_rand_indx)
+print(inter_df)
+
+### Visualizations of networks
+conds <- names(slis) # Get names
+# Reuse Ls from previous step
+
+for(cond in conds){
+  L <- abs(Ls[[cond]])
+  png(paste0(cond, "_L.png"), width = 600, height = 600)
+  pheatmap(L,
+           cluster_rows = FALSE, 
+           cluster_cols = FALSE,
+           color = viridis(256),
+           breaks = seq(0, 0.15, length.out = 257),
+           show_rownames = FALSE, 
+           show_colnames = FALSE, 
+           legend = FALSE,
+           border_color = NA)
+  dev.off()
+}
+
+### Subject separate estimates
+load("subj_ests.rda")
+eigvecs <- group <- c()
+for(i in 1:16){
+  for(cond in conds){
+    L <- slis_all[[cond]][[i]]$L
+    eigL <- eigen(L)
+    eigvecs <- rbind(eigvecs, t(eigL$vectors[,1]))
+    group <- c(group, cond)
+  }
+}
+
+# t-SNE
+set.seed(123)
+tsne_result <- Rtsne(as.matrix(eigvecs), dims = 2, perplexity = 10, verbose = TRUE, max_iter = 1000)
+tsne_df <- data.frame(group = group, X1 = tsne_result$Y[,1], X2 = tsne_result$Y[,2])
+
+# Scatter plot of eigenvectors
+ggplot(tsne_df, aes(x = X1, y = X2, color = group)) +
+  geom_point(size = 3) +
+  labs(title = "Scatter Plot of Eigenvectors", x = "X1", y = "X2") +
+  theme_minimal()
