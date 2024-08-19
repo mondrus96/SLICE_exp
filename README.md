@@ -1,5 +1,4 @@
 # Sparse + Low Rank Inverse Covariance Estimation (SLICE) Experiments
-
 SLICE proposes an effective algorithm for the sparse + low rank Gaussian graphical model. The objective we seek to minimize is:
 
 ```math
@@ -19,3 +18,67 @@ The second step is a sparse Gaussian graphical model problem of the sample covar
 ```math
 {\boldsymbol{\hat{S}}}^{(i+1)} = {\underset{\boldsymbol{\hat{S}}}{\text{argmax}}} \, Q({\boldsymbol{\hat{S}}} \mid {\boldsymbol{\hat{S}}}^{(i)}).
 ```
+
+## Simulations
+We show improved recovery of both sparse and low rank components against the state-of-the-art (tGLASSO; , rcLVGLASSO; , ). Importantly, we drastically improve upon current methods in estimating the low rank, latent component. An example of this improvement is best shown in the following comparison:
+
+![Crescent recovery](Analysis/cres.png)
+![Spiral recovery](Analysis/spiral.png)
+
+Our overall simulation results are shown below
+
+![Simulation 1 Results](sim1_results.png)
+
+### Simulation Setting 1 (Random Clusters)
+| Method       | TPR($\hat{\mathbf{S}}, \mathbf{S}^*$) | TNR($\hat{\mathbf{S}}, \mathbf{S}^*$) | F1($\hat{\mathbf{S}}, \mathbf{S}^*$) | $\sin\theta(\hat{\mathbf{u}}_1, \mathbf{u}^*_1)$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_2$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_F$ |
+|--------------|---------------------------------------|---------------------------------------|---------------------------------------|--------------------------------------------|-----------------------------------------|----------------------------------------|
+| nnLVG        | 0.984                                 | 0.111                                 | 0.0570                                | 0.195                                      | 97.7                                    | 97.7                                   |
+| rcLVG        | **0.998**                             | 0.00926                               | 0.0522                                | 0.994                                      | 99.6                                    | 97.7                                   |
+| tGLASSO      | 0.0922                                | **0.966**                             | 0.152                                 | NA                                        | NA                                      | NA                                     |
+| SLICE (L1)   | 0.718                                 | 0.865                                 | 0.216                                 | 0.0839                                    | **7.03**                                | **1.91**                               |
+| SLICE (GSCAD)| 0.804                                 | 0.851                                 | **0.223**                             | 0.0836                                    | 24.5                                    | 20.2                                   |
+| SLICE (CLIME)| 0.846                                 | 0.707                                 | 0.140                                 | **0.0802**                                | 18.4                                    | 14.0                                   |
+
+### Simulation Setting 2 (Spiral)
+| Method       | TPR($\hat{\mathbf{S}}, \mathbf{S}^*$) | TNR($\hat{\mathbf{S}}, \mathbf{S}^*$) | F1($\hat{\mathbf{S}}, \mathbf{S}^*$) | $\sin\theta(\hat{\mathbf{u}}_1, \mathbf{u}^*_1)$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_2$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_F$ |
+|--------------|---------------------------------------|---------------------------------------|---------------------------------------|--------------------------------------------|-----------------------------------------|----------------------------------------|
+| nnLVG        | 0.981                                 | 0.0656                                | 0.0542                                | 0.727                                      | 42.8                                    | 22.3                                   |
+| rcLVG        | **0.983**                             | 0.0550                                | 0.0537                                | 0.998                                      | 60.3                                    | 22.4                                   |
+| tGLASSO      | 0.0315                                | **1.00**                              | 0.0609                                | NA                                        | NA                                      | NA                                     |
+| SLICE (L1)   | 0.738                                 | 0.861                                 | 0.216                                 | 0.0683                                    | 2.69                                    | **0.684**                              |
+| SLICE (GSCAD)| 0.813                                 | 0.862                                 | **0.237**                             | **0.0681**                                | **2.64**                                | 0.701                                  |
+| SLICE (CLIME)| 0.851                                 | 0.753                                 | 0.157                                 | 0.0687                                    | 2.69                                    | 0.717                                  |
+
+### Simulation Setting 3 (Interlocking Crescents)
+| Method       | TPR($\hat{\mathbf{S}}, \mathbf{S}^*$) | TNR($\hat{\mathbf{S}}, \mathbf{S}^*$) | F1($\hat{\mathbf{S}}, \mathbf{S}^*$) | $\sin\theta(\hat{\mathbf{u}}_1, \mathbf{u}^*_1)$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_2$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_F$ |
+|--------------|---------------------------------------|---------------------------------------|---------------------------------------|--------------------------------------------|-----------------------------------------|----------------------------------------|
+| nnLVG        | 0.739                                 | 0.859                                 | 0.219                                 | 0.226                                      | 2.40                                    | 1.38                                   |
+| rcLVG        | **0.988**                             | 0.111                                 | 0.0572                                | 1.00                                       | 6.58                                    | 1.54                                   |
+| tGLASSO      | 0.0156                                | **1.00**                              | 0.0309                                | NA                                        | NA                                      | NA                                     |
+| SLICE (L1)   | 0.729                                 | 0.860                                 | 0.212                                 | 0.188                                      | **1.07**                                | **0.240**                              |
+| SLICE (GSCAD)| 0.810                                 | 0.862                                 | **0.236**                             | **0.182**                                | 0.966                                    | 0.246                                  |
+| SLICE (CLIME)| 0.845                                 | 0.757                                 | 0.157                                 | 0.186                                      | 1.01                                    | 0.245                                  |
+
+### Simulation Setting 4 (Famous Faces EEG)
+| Method       | TPR($\hat{\mathbf{S}}, \mathbf{S}^*$) | TNR($\hat{\mathbf{S}}, \mathbf{S}^*$) | F1($\hat{\mathbf{S}}, \mathbf{S}^*$) | $\sin\theta(\hat{\mathbf{u}}_1, \mathbf{u}^*_1)$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_2$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_F$ |
+|--------------|---------------------------------------|---------------------------------------|---------------------------------------|--------------------------------------------|-----------------------------------------|----------------------------------------|
+| nnLVG        | 0.977                                 | 0.0276                                | 0.153                                 | 0.294                                      | 40.3                                    | 26.2                                   |
+| rcLVG        | 0.963                                 | 0.0441                                | 0.153                                 | 0.999                                      | 464                                     | 26.2                                   |
+| tGLASSO      | 0.243                                 | **0.996**                             | 0.379                                 | NA                                        | NA                                      | NA                                     |
+| SLICE (L1)   | 0.992                                 | 0.567                                 | 0.389                                 | 0.0380                                    | 6.78                                    | 3.46                                   |
+| SLICE (GSCAD)| 0.980                                 | 0.400                                 | 0.272                                 | 0.0502                                    | 17.5                                    | 10.7                                   |
+| SLICE (CLIME)| **0.998**                             | 0.777                                 | **0.457**                             | **0.0342**                                | **4.56**                                | **2.40**                               |
+
+## Neuroimaging studies
+We apply SLICE to the NYU CSC resting state fMRI dataset, and compare the recovery of sparse edges to the state-of-the-art. We use a physiological based distance metric to quantify differences between methods, where lower is better.
+
+| Method   | $d_w(\hat{\mathbf{S}})$ Visit 2 | Sparsity Visit 2 | $d_w(\hat{\mathbf{S}})$ Visit 3 | Sparsity Visit 3 |
+|----------|---------------------------------|------------------|---------------------------------|------------------|
+| nnLVG    | 3.7580                          | 0.9712           | 3.5263                          | 0.9736           |
+| rcLVG    | 5.9804                          | 0.9537           | 5.7569                          | 0.9511           |
+| tGLASSO  | 11.2991                         | 0.9663           | 11.7090                         | 0.9795           |
+| SLICE    | **2.9354**                      | 0.9694           | **2.7748**                      | 0.9632           |
+
+We also apply SLICE to a task based EEG study, where individuals are shown three different facial stimuli. We simulate semi-synthetic samples to show that our method is robust and that the low rank, latent component can be used to learn patterns of neural activity that differentiate between the stimuli. The confusion matrix for the best combination of $r$ and $\rho$ is shown below:
+
+![EEG confusion matrix](EEG/classification/confmat.png)
