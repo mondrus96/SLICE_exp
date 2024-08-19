@@ -70,7 +70,7 @@ Our comprehensive simulation results are provided below:
 | SLICE (CLIME)| **0.998**                             | 0.777                                 | **0.457**                             | **0.0342**                                | **4.56**                                | **2.40**                               |
 
 ## Neuroimaging studies
-We apply SLICE to the NYU CSC resting state fMRI dataset, and compare the recovery of sparse edges to the state-of-the-art. We use a physiological based distance metric to quantify differences between methods, where lower is better.
+We apply SLICE to the [NYU CSC resting state fMRI dataset](https://www.nitrc.org/projects/nyu_trt), and compare the recovery of sparse edges to the state-of-the-art. We use a physiological based distance metric to quantify differences between methods, where lower is better.
 
 | Method   | $d_w(\hat{\mathbf{S}})$ Visit 2 | Sparsity Visit 2 | $d_w(\hat{\mathbf{S}})$ Visit 3 | Sparsity Visit 3 |
 |----------|---------------------------------|------------------|---------------------------------|------------------|
@@ -79,6 +79,6 @@ We apply SLICE to the NYU CSC resting state fMRI dataset, and compare the recove
 | tGLASSO  | 11.2991                         | 0.9663           | 11.7090                         | 0.9795           |
 | SLICE    | **2.9354**                      | 0.9694           | **2.7748**                      | 0.9632           |
 
-We also apply SLICE to a task based EEG study, where individuals are shown three different facial stimuli. We simulate semi-synthetic samples to show that our method is robust and that the low rank, latent component can be used to learn patterns of neural activity that differentiate between the stimuli. The confusion matrix for the best combination of $r$ and $\rho$ is shown below:
+We also apply SLICE to a [task based EEG study](https://www.nature.com/articles/sdata20151), where individuals are shown three different facial stimuli. We simulate semi-synthetic samples to show that our method is robust and that the low rank, latent component can be used to learn patterns of neural activity that differentiate between the stimuli. The confusion matrix for the best combination of $r$ and $\rho$ is shown below:
 
 <img src="EEG/classification/confmat.png" alt="EEG confusion matrix" width="200" height="200">
