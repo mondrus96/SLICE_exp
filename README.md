@@ -32,7 +32,7 @@ Our comprehensive simulation results are provided below:
 ![Simulation 1 Results](sim1_results.png)
 
 ### Simulation Setting 1 (Random Clusters)
-| Method       | TPR($\hat{\mathbf{S}}, \mathbf{S}^*$) | TNR($\hat{\mathbf{S}}, \mathbf{S}^*$) | F1($\hat{\mathbf{S}}, \mathbf{S}^*$) | $\sin\theta(\hat{\mathbf{u}}_1, \mathbf{u}^*_1)$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_2$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_F$ |
+| Method       | TPR($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | TNR($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | F1($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | $\sin\theta(\hat{\boldsymbol{u}}_1, \boldsymbol{u}^*_1)$ | $\|\hat{\boldsymbol{L}} - \boldsymbol{L}^*\|_2$ | $\|\hat{\boldsymbol{L}} - \boldsymbol{L}^*\|_F$ |
 |--------------|---------------------------------------|---------------------------------------|---------------------------------------|--------------------------------------------|-----------------------------------------|----------------------------------------|
 | nnLVG        | 0.984                                 | 0.111                                 | 0.0570                                | 0.195                                      | 97.7                                    | 97.7                                   |
 | rcLVG        | **0.998**                             | 0.00926                               | 0.0522                                | 0.994                                      | 99.6                                    | 97.7                                   |
@@ -42,7 +42,7 @@ Our comprehensive simulation results are provided below:
 | SLICE (CLIME)| 0.846                                 | 0.707                                 | 0.140                                 | **0.0802**                                | 18.4                                    | 14.0                                   |
 
 ### Simulation Setting 2 (Spiral)
-| Method       | TPR($\hat{\mathbf{S}}, \mathbf{S}^*$) | TNR($\hat{\mathbf{S}}, \mathbf{S}^*$) | F1($\hat{\mathbf{S}}, \mathbf{S}^*$) | $\sin\theta(\hat{\mathbf{u}}_1, \mathbf{u}^*_1)$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_2$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_F$ |
+| Method       | TPR($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | TNR($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | F1($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | $\sin\theta(\hat{\boldsymbol{u}}_1, \boldsymbol{u}^*_1)$ | $\|\hat{\boldsymbol{L}} - \boldsymbol{L}^*\|_2$ | $\|\hat{\boldsymbol{L}} - \boldsymbol{L}^*\|_F$ |
 |--------------|---------------------------------------|---------------------------------------|---------------------------------------|--------------------------------------------|-----------------------------------------|----------------------------------------|
 | nnLVG        | 0.981                                 | 0.0656                                | 0.0542                                | 0.727                                      | 42.8                                    | 22.3                                   |
 | rcLVG        | **0.983**                             | 0.0550                                | 0.0537                                | 0.998                                      | 60.3                                    | 22.4                                   |
@@ -52,7 +52,7 @@ Our comprehensive simulation results are provided below:
 | SLICE (CLIME)| 0.851                                 | 0.753                                 | 0.157                                 | 0.0687                                    | 2.69                                    | 0.717                                  |
 
 ### Simulation Setting 3 (Interlocking Crescents)
-| Method       | TPR($\hat{\mathbf{S}}, \mathbf{S}^*$) | TNR($\hat{\mathbf{S}}, \mathbf{S}^*$) | F1($\hat{\mathbf{S}}, \mathbf{S}^*$) | $\sin\theta(\hat{\mathbf{u}}_1, \mathbf{u}^*_1)$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_2$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_F$ |
+| Method       | TPR($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | TNR($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | F1($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | $\sin\theta(\hat{\boldsymbol{u}}_1, \boldsymbol{u}^*_1)$ | $\|\hat{\boldsymbol{L}} - \boldsymbol{L}^*\|_2$ | $\|\hat{\boldsymbol{L}} - \boldsymbol{L}^*\|_F$ |
 |--------------|---------------------------------------|---------------------------------------|---------------------------------------|--------------------------------------------|-----------------------------------------|----------------------------------------|
 | nnLVG        | 0.739                                 | 0.859                                 | 0.219                                 | 0.226                                      | 2.40                                    | 1.38                                   |
 | rcLVG        | **0.988**                             | 0.111                                 | 0.0572                                | 1.00                                       | 6.58                                    | 1.54                                   |
@@ -62,7 +62,7 @@ Our comprehensive simulation results are provided below:
 | SLICE (CLIME)| 0.845                                 | 0.757                                 | 0.157                                 | 0.186                                      | 1.01                                    | 0.245                                  |
 
 ### Simulation Setting 4 (Famous Faces EEG)
-| Method       | TPR($\hat{\mathbf{S}}, \mathbf{S}^*$) | TNR($\hat{\mathbf{S}}, \mathbf{S}^*$) | F1($\hat{\mathbf{S}}, \mathbf{S}^*$) | $\sin\theta(\hat{\mathbf{u}}_1, \mathbf{u}^*_1)$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_2$ | $\|\hat{\mathbf{L}} - \mathbf{L}^*\|_F$ |
+| Method       | TPR($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | TNR($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | F1($\hat{\boldsymbol{S}}, \boldsymbol{S}^*$) | $\sin\theta(\hat{\boldsymbol{u}}_1, \boldsymbol{u}^*_1)$ | $\|\hat{\boldsymbol{L}} - \boldsymbol{L}^*\|_2$ | $\|\hat{\boldsymbol{L}} - \boldsymbol{L}^*\|_F$ |
 |--------------|---------------------------------------|---------------------------------------|---------------------------------------|--------------------------------------------|-----------------------------------------|----------------------------------------|
 | nnLVG        | 0.977                                 | 0.0276                                | 0.153                                 | 0.294                                      | 40.3                                    | 26.2                                   |
 | rcLVG        | 0.963                                 | 0.0441                                | 0.153                                 | 0.999                                      | 464                                     | 26.2                                   |
@@ -74,7 +74,7 @@ Our comprehensive simulation results are provided below:
 ## Neuroimaging studies
 We apply SLICE to the [NYU CSC resting state fMRI dataset](https://www.nitrc.org/projects/nyu_trt), and compare the recovery of sparse edges to the state-of-the-art. We use a physiological based distance metric to quantify differences between methods, where lower is better.
 
-| Method   | $d_w(\hat{\mathbf{S}})$ Visit 2 | Sparsity Visit 2 | $d_w(\hat{\mathbf{S}})$ Visit 3 | Sparsity Visit 3 |
+| Method   | $d_w(\hat{\boldsymbol{S}})$ Visit 2 | Sparsity Visit 2 | $d_w(\hat{\boldsymbol{S}})$ Visit 3 | Sparsity Visit 3 |
 |----------|---------------------------------|------------------|---------------------------------|------------------|
 | nnLVG    | 3.7580                          | 0.9712           | 3.5263                          | 0.9736           |
 | rcLVG    | 5.9804                          | 0.9537           | 5.7569                          | 0.9511           |
