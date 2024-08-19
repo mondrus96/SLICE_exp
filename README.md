@@ -23,7 +23,7 @@ The second step is a sparse Gaussian graphical model problem of the sample covar
 We show improved recovery of both sparse and low rank components against the state-of-the-art (tGLASSO; , rcLVGLASSO; , ). Importantly, we drastically improve upon current methods in estimating the low rank, latent component. An example of this improvement is best shown in the following comparison:
 
 ![Crescent recovery](Analysis/cres.png)
-![Spiral recovery](Analysis/spiral.png)
+![Spiral recovery](Analysis/spir.png)
 
 Our overall simulation results are shown below
 
@@ -81,4 +81,4 @@ We apply SLICE to the NYU CSC resting state fMRI dataset, and compare the recove
 
 We also apply SLICE to a task based EEG study, where individuals are shown three different facial stimuli. We simulate semi-synthetic samples to show that our method is robust and that the low rank, latent component can be used to learn patterns of neural activity that differentiate between the stimuli. The confusion matrix for the best combination of $r$ and $\rho$ is shown below:
 
-![EEG confusion matrix](EEG/classification/confmat.png)
+<img src="EEG/classification/confmat.png" alt="EEG confusion matrix" width="200" height="200">
