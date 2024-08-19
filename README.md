@@ -13,7 +13,7 @@ We propose an efficient pseudo-EM algorithm which proceeds by alternating betwee
 \boldsymbol{\hat{L}} = \text{SVD}_r(\boldsymbol{\tilde{\Sigma}}^{-1} - \boldsymbol{\hat{S}}).
 ```
 
-The second step is a sparse Gaussian graphical model problem of the sample covariance matrix conditioned on the low rank matrix. This can be solved using standard methods such as GLASSO, CLIME, among others:
+The second step is a sparse Gaussian graphical model problem of the sample covariance matrix conditioned on the low rank matrix. This can be solved using standard methods such as [GLASSO; Friedman et al., 2008](https://academic.oup.com/biostatistics/article/9/3/432/224260), [CLIME; Cai et al., 2011](https://www.tandfonline.com/doi/abs/10.1198/jasa.2011.tm10155), among others:
 
 ```math
 {\boldsymbol{\hat{S}}}^{(i+1)} = {\underset{\boldsymbol{\hat{S}}}{\text{argmax}}} \, Q({\boldsymbol{\hat{S}}} \mid {\boldsymbol{\hat{S}}}^{(i)}).
