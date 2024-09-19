@@ -16,7 +16,6 @@ for(cond in conds){
   }
   Xs[[cond]] <- scale(Xs[[cond]]) # Scale data
 }
-sapply(ncol())
 
 # Run estimation
 set.seed(123)
