@@ -1,9 +1,8 @@
 library(ggplot2)
 library(dplyr)
-library(Rtsne)
 library(pheatmap)
 library(viridis)
-
+library(colorspace)
 # Load data and functions
 sapply((paste0("../Core/", list.files("../Core/"))), source)
 load("ests.rda")
@@ -44,10 +43,25 @@ rownames(intra_df) <- NULL
 print(intra_df)
 
 # Labels and palette
-AAL <- read.table("AAL.txt")
-labels <- sub(".*\\s([^_]+)_.*", "\\1", AAL$Labels)
-labels <- data.frame(Group = labels)
-palette <- make_palette(28) # Make colours for all
+AAL <- read.csv("AAL.txt")
+vox_ctrs <- read.csv("voxel_centers.txt", header = FALSE)
+
+# For each row in vox_ctrs, find the closest row in AAL
+vox_ctrs$AAL_Label <- apply(vox_ctrs, 1, function(vox_row) {
+  # Calculate distances to all points in AAL
+  distances <- mapply(eucl_dist,
+                      x1 = vox_row[1], y1 = vox_row[2], z1 = vox_row[3],
+                      x2 = AAL$X, y2 = AAL$Y, z2 = AAL$Z)
+  
+  # Find the index of the minimum distance
+  nearest_index <- which.min(distances)
+  
+  # Return the corresponding AAL label
+  return(AAL$Group[nearest_index])
+})
+
+labels <- data.frame(Group = vox_ctrs$AAL_Label)
+palette <- make_palette(length(unique(labels$Group))) # Make colours for all
 group_colors <- list(Group = (setNames(palette, unique(labels$Group))))
 
 ### Intergroup statistics
@@ -71,62 +85,22 @@ for(i in 1:nrow(inter_df)){
   clust2 <- kmeans(eigL2$vectors[,1:r], r, 10000)$cluster
   adj_rand_indx <- c(adj_rand_indx, ari(clust1, clust2))
   
-  png(paste0(g1, g2, "_L.png"), width = 600, height = 600)
-  pheatmap((L1 - L2)^2,
+  png(paste0(g1, g2, "_L.png"), width = 1600, height = 1200, res = 200)
+  diffL <- (L1 - L2)^2
+  rownames(diffL) <- colnames(diffL) <- rownames(labels)
+  pheatmap(diffL,
            cluster_rows = FALSE, 
            cluster_cols = FALSE,
            color = viridis(256),
            breaks = seq(0.01, 0.02, length.out = 257),
-           show_rownames = FALSE, 
-           show_colnames = FALSE, 
            legend = FALSE,
+           show_rownames = FALSE, 
+           show_colnames = FALSE,
            border_color = NA,
            annotation_col = labels,
            annotation_colors = group_colors,
-           cellheight=4, cellwidth=4)
+           cellheight=3, cellwidth=3)
   dev.off()
 }
 inter_df <- cbind(inter_df, sin_theta, frob_norm, spec_norm, adj_rand_indx)
 print(inter_df)
-
-### Visualizations of networks
-conds <- names(slis) # Get names
-# Reuse Ls from previous step
-
-for(cond in conds){
-  L <- abs(Ls[[cond]])
-  png(paste0(cond, "_L.png"), width = 600, height = 600)
-  pheatmap(L,
-           cluster_rows = FALSE, 
-           cluster_cols = FALSE,
-           color = viridis(256),
-           breaks = seq(0, 0.15, length.out = 257),
-           show_rownames = FALSE, 
-           show_colnames = FALSE, 
-           legend = FALSE,
-           border_color = NA)
-  dev.off()
-}
-
-### Subject separate estimates
-load("subj_ests.rda")
-eigvecs <- group <- c()
-for(i in 1:16){
-  for(cond in conds){
-    L <- slis_all[[cond]][[i]]$L
-    eigL <- eigen(L)
-    eigvecs <- rbind(eigvecs, t(eigL$vectors[,1]))
-    group <- c(group, cond)
-  }
-}
-
-# t-SNE
-set.seed(123)
-tsne_result <- Rtsne(as.matrix(eigvecs), dims = 2, perplexity = 10, verbose = TRUE, max_iter = 1000)
-tsne_df <- data.frame(group = group, X1 = tsne_result$Y[,1], X2 = tsne_result$Y[,2])
-
-# Scatter plot of eigenvectors
-ggplot(tsne_df, aes(x = X1, y = X2, color = group)) +
-  geom_point(size = 3) +
-  labs(title = "Scatter Plot of Eigenvectors", x = "X1", y = "X2") +
-  theme_minimal()

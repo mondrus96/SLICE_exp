@@ -86,4 +86,3 @@ We also apply SLICE to a [task based EEG study](https://www.nature.com/articles/
 <p align="center">
   <img src="EEG/classification/confmat.png" alt="EEG confusion matrix" style="width:30%;">
 </p>
->>>>>>> aaf385b5152e498775299f41c38de3f67461b9fe

@@ -20,17 +20,19 @@ mean_df <- aggregate(. ~ model + visit, data = df, FUN = mean)
 
 # Load data
 Xall <- read.table("visit2.txt")
-AAL <- read.table("AAL.txt")
-labels <- sub(".*\\s([^_]+)_.*", "\\1", AAL$Labels)
-labels <- data.frame(Group = labels)
+AAL <- read.csv("AAL.txt")
+labels <- data.frame(Group = AAL$Group)
 
 # Get first subjets data
 X <- Xall[1:190,]
 
 # Set seed for estimation
 set.seed(123)
-palette <- make_palette(28) # Make colours for all
-group_colors <- list(Group = (setNames(palette, unique(labels$Group))))
+palette <- make_palette(length(unique(AAL$Group))) # Make colours for all
+group_colors <- list(Group = (setNames(palette, 
+                                       c("Temporal", "Occipital", "Frontal", 
+                                         "Central", "Insula and Cingulate Gyri", 
+                                         "Parietal"))))
 models <- c("SLICE", "nnLVGLASSO", "rcLVGLASSO")
 for(model in models){
   if(model == "SLICE"){
@@ -46,17 +48,19 @@ for(model in models){
     out <- ebic.tg(X, taus = logseq(1e-5, 0.2, 20)) # tGLASSO
   }
   # Latent
-  rownames(out$L) <- colnames(out$L) <- rep("", nrow(out$L))
-  png(paste0(model, "_L.png"), width = 750, height = 600)
+  png(paste0(model, "_L.png"), width = 1200, height = 1000, res = 130)
+  rownames(out$L) <- colnames(out$L) <- rownames(labels)
   pheatmap(out$L,
            cluster_rows = FALSE, 
            cluster_cols = FALSE,
            color = viridis(256),
            legend = FALSE,
            border_color = NA,
+           show_rownames = FALSE, 
+           show_colnames = FALSE,
            annotation_col = labels,
            annotation_colors = group_colors,
-           cellheight=4, cellwidth=4)
+           cellheight=5, cellwidth=5)
   dev.off()
   
   # Sparse

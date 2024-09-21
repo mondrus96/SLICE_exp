@@ -198,3 +198,8 @@ color_distance <- function(color1, color2) {
   rgb2 <- as(color2, "RGB")@coords
   sqrt(sum((rgb1 - rgb2)^2)) * 255
 }
+
+# Function to calculate Euclidean distance
+eucl_dist <- function(x1, y1, z1, x2, y2, z2) {
+  sqrt((x2 - x1)^2 + (y2 - y1)^2 + (z2 - z1)^2)
+}

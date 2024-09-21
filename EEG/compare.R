@@ -51,7 +51,6 @@ for(iter in 1:100){ # Loop over iterations
   X <- X[sample(nrow(X)),] # Shuffle rows
   mid <- nrow(X)/2
   train <- 1:mid; test <- (mid + 1):nrow(X)
-  #for(i in seq_along(models)){
   for(i in 1:2){
     model_name <- c(model_name, names(models)[i])
     model <- models[[i]]
