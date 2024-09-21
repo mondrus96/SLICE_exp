@@ -163,3 +163,38 @@ TNrate <- function(S_star, S_hat){
   TN <- sum(labels_true == 0 & labels_pred == 0)
   return(TN/sum(labels_true == 0))
 }
+
+make_palette <- function(n, s_range = c(0.5, 0.9), v_range = c(0.6, 0.9)) {
+  # Generate evenly spaced hues
+  hues <- seq(0, 360 * (n - 1) / n, length.out = n)
+  
+  # Create colors in HSV space with varying saturation and value
+  H <- hues
+  S <- seq(s_range[1], s_range[2], length.out = n)
+  V <- seq(v_range[2], v_range[1], length.out = n)  # Reverse V to make first colors brighter
+  
+  # Shuffle S and V to avoid predictable patterns
+  set.seed(42)  # For reproducibility
+  S <- sample(S)
+  V <- sample(V)
+  
+  # Convert to RGB
+  rgb_colors <- HSV(H, S, V)
+  
+  # Ensure colors are distinct enough
+  for (i in 2:n) {
+    while (color_distance(rgb_colors[i], rgb_colors[i-1]) < 20) {
+      S[i] <- runif(1, s_range[1], s_range[2])
+      V[i] <- runif(1, v_range[1], v_range[2])
+      rgb_colors[i] <- HSV(H[i], S[i], V[i])
+    }
+  }
+  
+  return(hex(rgb_colors))
+}
+
+color_distance <- function(color1, color2) {
+  rgb1 <- as(color1, "RGB")@coords
+  rgb2 <- as(color2, "RGB")@coords
+  sqrt(sum((rgb1 - rgb2)^2)) * 255
+}

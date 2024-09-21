@@ -43,6 +43,13 @@ colnames(intra_df) <- c("group", "frob_norm", "spec_norm",
 rownames(intra_df) <- NULL
 print(intra_df)
 
+# Labels and palette
+AAL <- read.table("AAL.txt")
+labels <- sub(".*\\s([^_]+)_.*", "\\1", AAL$Labels)
+labels <- data.frame(Group = labels)
+palette <- make_palette(28) # Make colours for all
+group_colors <- list(Group = (setNames(palette, unique(labels$Group))))
+
 ### Intergroup statistics
 inter_df <- matrix(c(1, 2, 1, 2, 3, 3), 3, 2) # Groups to compare
 inter_df <- as.data.frame(inter_df)
@@ -73,7 +80,10 @@ for(i in 1:nrow(inter_df)){
            show_rownames = FALSE, 
            show_colnames = FALSE, 
            legend = FALSE,
-           border_color = NA)
+           border_color = NA,
+           annotation_col = labels,
+           annotation_colors = group_colors,
+           cellheight=4, cellwidth=4)
   dev.off()
 }
 inter_df <- cbind(inter_df, sin_theta, frob_norm, spec_norm, adj_rand_indx)

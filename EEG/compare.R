@@ -28,11 +28,6 @@ frob.normalize <- function(mat) {
   return(mat/norm(mat, "F"))
 }
 
-#### TWO THINGS TO EXPLORE ####
-# 1: Normalization of outputs
-# 2: Tune to similar sparsity and rank
-# 3: Use CV once, set for all remaining
-
 # Set params
 params <- list(sli = c(0.15, 9),
                nnlvg = c(0.1, 0.007),

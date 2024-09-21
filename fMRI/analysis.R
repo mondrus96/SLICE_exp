@@ -3,6 +3,8 @@ library(ggplot2)
 library(reshape2)
 library(viridis)
 library(rgl)
+library(pheatmap)
+library(colorspace)
 sapply((paste0("../Core/", list.files("../Core/"))), source)
 
 # Get data for all models
@@ -19,12 +21,16 @@ mean_df <- aggregate(. ~ model + visit, data = df, FUN = mean)
 # Load data
 Xall <- read.table("visit2.txt")
 AAL <- read.table("AAL.txt")
+labels <- sub(".*\\s([^_]+)_.*", "\\1", AAL$Labels)
+labels <- data.frame(Group = labels)
 
 # Get first subjets data
 X <- Xall[1:190,]
 
 # Set seed for estimation
 set.seed(123)
+palette <- make_palette(28) # Make colours for all
+group_colors <- list(Group = (setNames(palette, unique(labels$Group))))
 models <- c("SLICE", "nnLVGLASSO", "rcLVGLASSO")
 for(model in models){
   if(model == "SLICE"){
@@ -40,18 +46,17 @@ for(model in models){
     out <- ebic.tg(X, taus = logseq(1e-5, 0.2, 20)) # tGLASSO
   }
   # Latent
-  rownames(out$L) <- colnames(out$L) <- 1:nrow(out$L)
-  rownames(out$L)[!(1:length(rownames(out$L)) %% 10 == 0)] <- ""
-  colnames(out$L)[!(1:length(colnames(out$L)) %% 10 == 0)] <- ""
-  png(paste0(model, "_L.png"), width = 600, height = 600)
-  pheatmap(out$L, 
+  rownames(out$L) <- colnames(out$L) <- rep("", nrow(out$L))
+  png(paste0(model, "_L.png"), width = 750, height = 600)
+  pheatmap(out$L,
            cluster_rows = FALSE, 
            cluster_cols = FALSE,
            color = viridis(256),
            legend = FALSE,
            border_color = NA,
-           fontsize_row = 20,
-           fontsize_col = 20)
+           annotation_col = labels,
+           annotation_colors = group_colors,
+           cellheight=4, cellwidth=4)
   dev.off()
   
   # Sparse
