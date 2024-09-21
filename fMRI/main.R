@@ -32,14 +32,14 @@ for(i in 1:subj){
   Sig1 <- cov(X1)
   
   if(model == "SLICE"){
-    cvout <- cv.slice(X1, lambdas = 0.5) # SLICE
-    out <- slice(Sig1, cvout$lambda, cvout$r)
+    cvout <- cv.slice(X1, rhos = 0.5) # SLICE
+    out <- slice(Sig1, cvout$rho, cvout$r)
   } else if(model == "nnLVGLASSO"){
-    cvout <- cv.nnlvg(X1, lambdas = 0.3) # nnLVGLASSO
-    out <- nnlvg(Sig1, cvout$lambda, cvout$gamma)
+    cvout <- cv.nnlvg(X1, rhos = 0.3) # nnLVGLASSO
+    out <- nnlvg(Sig1, cvout$rho, cvout$gamma)
   } else if(model == "rcLVGLASSO"){
-    cvout <- cv.rclvg(X1, lambdas = 0.3) # rcLVGLASSO
-    out <- rclvg(Sig1, cvout$lambda, cvout$r)
+    cvout <- cv.rclvg(X1, rhos = 0.3) # rcLVGLASSO
+    out <- rclvg(Sig1, cvout$rho, cvout$r)
   } else if(model == "tGLASSO"){
     out <- ebic.tg(X1, taus = logseq(1e-5, 0.2, 20)) # tGLASSO
     out$L <- NULL; out2 <- ebic.tg(X2)
